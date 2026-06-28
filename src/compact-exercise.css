@@ -25,3 +25,26 @@
   min-width: 62px;
   font-size: 13px;
 }
+
+.tiny-duration-control {
+  max-width: 170px;
+  grid-template-columns: 18px minmax(112px, 1fr) 18px;
+  gap: 4px;
+}
+
+.tiny-duration-control button {
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+}
+
+.tiny-duration-control strong {
+  height: 26px;
+  min-width: 112px;
+  font-size: 13px;
+  padding: 0 10px;
+}
+
+.tiny-duration-control strong::before {
+  content: 'Durée : ';
+}
