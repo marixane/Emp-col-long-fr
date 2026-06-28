@@ -486,10 +486,6 @@ function App() {
             </div>
           </header>
 
-          <p className="phone-rule">
-            L'usage du téléphone portable est interdit, même comme calculatrice.
-          </p>
-
           <div className="exercise-list">
             {exercises.map((exercise, index) => (
               <section
