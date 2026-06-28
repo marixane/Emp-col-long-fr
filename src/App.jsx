@@ -18,11 +18,26 @@ function App() {
   const [teacher, setTeacher] = useState('Prof Marwane.R');
   const [exercises, setExercises] = useState(DEFAULT_EXERCISES);
   const [isExporting, setIsExporting] = useState(false);
+  const [dragState, setDragState] = useState(null);
   const pageRef = useRef(null);
 
   const updateExercise = (id, field, value) => {
     setExercises((items) =>
       items.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+    );
+  };
+
+  const updateImagePosition = (id, nextX, nextY) => {
+    setExercises((items) =>
+      items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              x: clamp(nextX, -200, 200),
+              y: clamp(nextY, -200, 200),
+            }
+          : item
+      )
     );
   };
 
@@ -39,6 +54,31 @@ function App() {
     };
 
     updateExercise(id, field, clamp(value, limits[field][0], limits[field][1]));
+  };
+
+  const startDrag = (event, exercise) => {
+    event.preventDefault();
+
+    setDragState({
+      id: exercise.id,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startX: exercise.x,
+      startY: exercise.y,
+    });
+  };
+
+  const moveDrag = (event) => {
+    if (!dragState) return;
+
+    const deltaX = event.clientX - dragState.startClientX;
+    const deltaY = event.clientY - dragState.startClientY;
+
+    updateImagePosition(dragState.id, dragState.startX + deltaX, dragState.startY + deltaY);
+  };
+
+  const endDrag = () => {
+    setDragState(null);
   };
 
   const resetPhotoPosition = (id) => {
@@ -108,12 +148,12 @@ function App() {
   };
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" onMouseMove={moveDrag} onMouseUp={endDrag} onMouseLeave={endDrag}>
       <section className="panel">
         <p className="eyebrow">A4 Exam Maker</p>
         <h1>Créer une feuille A4 avec entête fixe</h1>
         <p className="intro">
-          Ajuste la hauteur, le zoom et la position des photos dans chaque exercice.
+          Clique sur une photo et déplace-la directement dans son exercice. Les sliders restent disponibles.
         </p>
 
         <div className="form-group">
@@ -274,8 +314,11 @@ function App() {
                 <div className="exercise-body">
                   {exercise.image ? (
                     <img
+                      className="draggable-photo"
                       src={exercise.image.url}
                       alt={exercise.image.name}
+                      onMouseDown={(event) => startDrag(event, exercise)}
+                      draggable="false"
                       style={{
                         transform: `translate(${exercise.x}px, ${exercise.y}px) scale(${exercise.zoom / 100})`,
                       }}
