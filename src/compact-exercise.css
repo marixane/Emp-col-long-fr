@@ -11,14 +11,14 @@
 }
 
 .exercise-title-controls {
-  gap: 4px;
+  gap: 3px;
   padding: 2px 8px;
 }
 
 .exercise-title-controls button {
-  width: 22px;
-  height: 22px;
-  font-size: 14px;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
   background: linear-gradient(145deg, #5f7f99 0%, #274761 48%, #0f2438 100%);
   color: #fff;
   border: 1px solid #0b1f33;
@@ -34,12 +34,14 @@
 }
 
 .exercise-title-controls strong {
-  min-width: 62px;
-  font-size: 13px;
+  min-width: 54px;
+  font-size: 11px;
+  color: #777;
 }
 
 .points-decoration {
   color: #777;
+  font-size: 11px;
 }
 
 .resize-handle {
