@@ -119,32 +119,40 @@ button:disabled {
   overflow: hidden;
 }
 
-.exam-header {
-  height: 78px;
+.exam-header.three-cell-header {
+  height: 82px;
   border: 3px solid #111;
   display: grid;
-  grid-template-columns: 250px 1fr 168px;
+  grid-template-columns: 31% 37% 32%;
 }
 
-.student-box,
-.title-box {
-  padding: 8px;
+.header-cell {
   border-right: 3px solid #111;
-  font-weight: bold;
-}
-
-.title-box {
+  padding: 8px 10px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   overflow: hidden;
-  line-height: 1.15;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: bold;
+  line-height: 1.18;
   word-break: break-word;
   overflow-wrap: anywhere;
 }
 
-.title-box strong {
+.header-cell:last-child {
+  border-right: 0;
+}
+
+.left-header-cell strong {
+  display: block;
+  font-size: 17px;
+  max-width: 100%;
+}
+
+.middle-header-cell strong {
   display: block;
   max-width: 100%;
   max-height: 62px;
@@ -152,55 +160,12 @@ button:disabled {
   white-space: normal;
 }
 
-.header-right {
-  display: grid;
-  grid-template-columns: 82px 82px;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 4px;
-}
-
-.level-box {
-  margin: 0 auto;
-  padding: 5px 4px;
-  background: #111;
-  color: white;
-  border-radius: 8px;
-  min-height: 46px;
-  width: 78px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.level-box span {
+.right-header-cell strong {
   display: block;
-  font-size: 10px;
-  line-height: 1;
-  margin-bottom: 3px;
-}
-
-.level-box strong {
-  display: block;
-  font-size: 12px;
-  line-height: 1.1;
-}
-
-.duration-box {
-  margin: 0 auto;
-  width: 62px;
-  height: 62px;
-  border: 2px solid #111;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-weight: bold;
-  font-size: 13px;
-  line-height: 1.05;
+  max-width: 100%;
+  max-height: 62px;
+  overflow: hidden;
   white-space: normal;
-  overflow-wrap: anywhere;
 }
 
 .small-badge {
