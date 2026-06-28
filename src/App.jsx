@@ -12,9 +12,10 @@ const clamp = (value, min, max) => Math.min(Math.max(Number(value), min), max);
 
 const getTitleFontSize = (text) => {
   const length = text.trim().length;
-  if (length > 95) return 12;
-  if (length > 70) return 14;
-  if (length > 48) return 16;
+  if (length > 115) return 11;
+  if (length > 90) return 12;
+  if (length > 65) return 14;
+  if (length > 42) return 16;
   return 18;
 };
 
@@ -159,11 +160,11 @@ function App() {
         <p className="eyebrow">A4 Exam Maker</p>
         <h1>Créer une feuille A4 avec entête fixe</h1>
         <p className="intro">
-          Une seule case titre. Le texte passe à la ligne et diminue automatiquement si nécessaire.
+          La case titre est fixe. Écris seulement le texte, il se place automatiquement dedans.
         </p>
 
         <div className="form-group">
-          <label>Niveau</label>
+          <label>Classe</label>
           <input value={studentLevel} onChange={(e) => setStudentLevel(e.target.value)} />
         </div>
 
@@ -173,7 +174,7 @@ function App() {
         </div>
 
         <div className="form-group">
-          <label>Titre complet</label>
+          <label>Texte du titre</label>
           <textarea
             value={testTitle}
             onChange={(e) => setTestTitle(e.target.value)}
@@ -284,12 +285,6 @@ function App() {
 
             <div className="level-box">{studentLevel}</div>
             <div className="duration-box">{duration}</div>
-
-            <div className="note-box">
-              <strong>Note</strong>
-              <div className="note-line" />
-              <span>/20</span>
-            </div>
 
             <div className="title-box">
               <strong style={{ fontSize: `${getTitleFontSize(testTitle)}px` }}>{testTitle}</strong>
