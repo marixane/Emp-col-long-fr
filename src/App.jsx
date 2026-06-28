@@ -9,7 +9,7 @@ const MIN_POINTS = 1;
 const MAX_POINTS = 20;
 const TOTAL_POINTS = 20;
 const TOTAL_EXERCISE_HEIGHT = 986;
-const TOTAL_SECOND_PAGE_HEIGHT = 1065;
+const TOTAL_SECOND_PAGE_HEIGHT = 840;
 const MIN_EXERCISE_HEIGHT = 120;
 const MIN_EXERCISES = 1;
 const MAX_EXERCISES = 6;
@@ -80,6 +80,18 @@ const createHeights = (count, totalHeight = TOTAL_EXERCISE_HEIGHT) => {
   return heights;
 };
 
+const assignBalancedPoints = (pageOneItems, pageTwoItems = [], includeSecondPage = false) => {
+  const totalCount = pageOneItems.length + (includeSecondPage ? pageTwoItems.length : 0);
+  const balanced = getBalancedPoints(totalCount);
+
+  const nextPageOne = pageOneItems.map((item, index) => ({ ...item, points: balanced[index] }));
+  const nextPageTwo = includeSecondPage
+    ? pageTwoItems.map((item, index) => ({ ...item, points: balanced[pageOneItems.length + index] }))
+    : pageTwoItems;
+
+  return { nextPageOne, nextPageTwo };
+};
+
 function App() {
   const [studentLevel, setStudentLevel] = useState('2 Bac SPF');
   const [durationIndex, setDurationIndex] = useState(DEFAULT_DURATION_INDEX);
@@ -100,7 +112,30 @@ function App() {
 
   const duration = DURATION_OPTIONS[durationIndex];
   const isHomework = assignmentType === 'homework';
-  const totalPoints = Math.round(exercises.reduce((sum, exercise) => sum + exercise.points, 0) * 100) / 100;
+  const activeExercises = [
+    ...exercises,
+    ...(isSecondPageEnabled ? secondPageExercises : []),
+  ];
+  const totalPoints = Math.round(activeExercises.reduce((sum, exercise) => sum + exercise.points, 0) * 100) / 100;
+
+  const getPointEntries = () => [
+    ...exercises.map((exercise, index) => ({ page: 1, index, exercise })),
+    ...(isSecondPageEnabled
+      ? secondPageExercises.map((exercise, index) => ({ page: 2, index, exercise }))
+      : []),
+  ];
+
+  const getCompensationEntry = (page, index) => {
+    const entries = getPointEntries();
+    if (entries.length < 2) return null;
+
+    const currentEntryIndex = entries.findIndex((entry) => entry.page === page && entry.index === index);
+    if (currentEntryIndex < 0) return null;
+
+    return currentEntryIndex < entries.length - 1
+      ? entries[currentEntryIndex + 1]
+      : entries[currentEntryIndex - 1];
+  };
 
   const changeAssignmentType = (nextType) => {
     setAssignmentType(nextType);
@@ -124,23 +159,18 @@ function App() {
     );
   };
 
-  const getCompensationIndex = (items, index) => {
-    if (items.length < 2) return -1;
-    return index < items.length - 1 ? index + 1 : index - 1;
-  };
-
   const canChangeExercisePoints = (page, index, step) => {
     const items = getPageExercises(page);
     const nextTargetPoints = Math.round((items[index].points + step * POINT_STEP) * 100) / 100;
 
-    if (!isTotalLocked || page === 2) {
+    if (!isTotalLocked) {
       return nextTargetPoints >= MIN_POINTS && nextTargetPoints <= MAX_POINTS;
     }
 
-    const compensationIndex = getCompensationIndex(items, index);
-    if (compensationIndex < 0) return false;
+    const compensationEntry = getCompensationEntry(page, index);
+    if (!compensationEntry) return false;
 
-    const nextCompensationPoints = Math.round((items[compensationIndex].points - step * POINT_STEP) * 100) / 100;
+    const nextCompensationPoints = Math.round((compensationEntry.exercise.points - step * POINT_STEP) * 100) / 100;
 
     return (
       nextTargetPoints >= MIN_POINTS &&
@@ -153,28 +183,37 @@ function App() {
   const changeExercisePoints = (page, index, step) => {
     if (!canChangeExercisePoints(page, index, step)) return;
 
-    setPageExercises(page, (items) => {
-      if (!isTotalLocked || page === 2) {
-        return items.map((item, itemIndex) =>
+    if (!isTotalLocked) {
+      setPageExercises(page, (items) =>
+        items.map((item, itemIndex) =>
           itemIndex === index
             ? { ...item, points: Math.round((item.points + step * POINT_STEP) * 100) / 100 }
             : item
-        );
-      }
+        )
+      );
+      return;
+    }
 
-      const compensationIndex = getCompensationIndex(items, index);
-      return items.map((item, itemIndex) => {
-        if (itemIndex === index) {
+    const compensationEntry = getCompensationEntry(page, index);
+    if (!compensationEntry) return;
+
+    const updateItems = (items, itemPage) =>
+      items.map((item, itemIndex) => {
+        if (itemPage === page && itemIndex === index) {
           return { ...item, points: Math.round((item.points + step * POINT_STEP) * 100) / 100 };
         }
 
-        if (itemIndex === compensationIndex) {
+        if (itemPage === compensationEntry.page && itemIndex === compensationEntry.index) {
           return { ...item, points: Math.round((item.points - step * POINT_STEP) * 100) / 100 };
         }
 
         return item;
       });
-    });
+
+    setExercises((items) => updateItems(items, 1));
+    if (isSecondPageEnabled) {
+      setSecondPageExercises((items) => updateItems(items, 2));
+    }
   };
 
   const changeTotalLock = (checked) => {
@@ -182,11 +221,17 @@ function App() {
 
     if (!checked) return;
 
-    setExercises((items) => {
-      const balanced = getBalancedPoints(items.length);
-      return items.map((item, index) => ({ ...item, points: balanced[index] }));
-    });
+    const { nextPageOne, nextPageTwo } = assignBalancedPoints(exercises, secondPageExercises, isSecondPageEnabled);
+    setExercises(nextPageOne);
+    setSecondPageExercises(nextPageTwo);
   };
+
+  const buildItemsWithCount = (currentItems, nextCount, page) =>
+    Array.from({ length: nextCount }, (_, index) => {
+      const existing = currentItems[index];
+      const nextPoints = existing?.points ?? 5;
+      return existing ? { ...existing, points: nextPoints, masks: existing.masks ?? [] } : createExercise(index, nextPoints);
+    });
 
   const changeExerciseCount = (page, step) => {
     const items = getPageExercises(page);
@@ -195,14 +240,25 @@ function App() {
 
     const totalHeight = page === 2 ? TOTAL_SECOND_PAGE_HEIGHT : TOTAL_EXERCISE_HEIGHT;
 
-    setPageExercises(page, (currentItems) => {
-      const balanced = getBalancedPoints(nextCount);
-      return Array.from({ length: nextCount }, (_, index) => {
-        const existing = currentItems[index];
-        const nextPoints = page === 1 && isTotalLocked ? balanced[index] : existing?.points ?? 5;
-        return existing ? { ...existing, points: nextPoints, masks: existing.masks ?? [] } : createExercise(index, nextPoints);
-      });
-    });
+    if (page === 1) {
+      const nextPageOneRaw = buildItemsWithCount(exercises, nextCount, page);
+      if (isTotalLocked) {
+        const { nextPageOne, nextPageTwo } = assignBalancedPoints(nextPageOneRaw, secondPageExercises, isSecondPageEnabled);
+        setExercises(nextPageOne);
+        setSecondPageExercises(nextPageTwo);
+      } else {
+        setExercises(nextPageOneRaw);
+      }
+    } else {
+      const nextPageTwoRaw = buildItemsWithCount(secondPageExercises, nextCount, page);
+      if (isTotalLocked) {
+        const { nextPageOne, nextPageTwo } = assignBalancedPoints(exercises, nextPageTwoRaw, isSecondPageEnabled);
+        setExercises(nextPageOne);
+        setSecondPageExercises(nextPageTwo);
+      } else {
+        setSecondPageExercises(nextPageTwoRaw);
+      }
+    }
 
     const setHeights = page === 2 ? setSecondPageHeights : setExerciseHeights;
     setHeights((heights) => {
@@ -216,6 +272,16 @@ function App() {
       resized[resized.length - 1] += diff;
       return resized;
     });
+  };
+
+  const changeSecondPageEnabled = (checked) => {
+    setIsSecondPageEnabled(checked);
+
+    if (!isTotalLocked) return;
+
+    const { nextPageOne, nextPageTwo } = assignBalancedPoints(exercises, secondPageExercises, checked);
+    setExercises(nextPageOne);
+    setSecondPageExercises(nextPageTwo);
   };
 
   const updateImagePosition = (page, id, nextX, nextY) => {
@@ -635,7 +701,7 @@ function App() {
           <input
             type="checkbox"
             checked={isSecondPageEnabled}
-            onChange={(e) => setIsSecondPageEnabled(e.target.checked)}
+            onChange={(e) => changeSecondPageEnabled(e.target.checked)}
           />
           Afficher la page 2
         </label>
@@ -644,11 +710,11 @@ function App() {
           <>
             <label className="total-lock-control">
               <input type="checkbox" checked={isTotalLocked} onChange={(e) => changeTotalLock(e.target.checked)} />
-              Total page 1 bloqué à 20 points
+              Total général bloqué à 20 points
             </label>
 
             <p className={`points-total ${isTotalLocked ? 'locked' : 'free'}`}>
-              {isTotalLocked ? 'Total page 1 bloqué : ' : 'Total page 1 libre : '}
+              {isTotalLocked ? 'Total général bloqué : ' : 'Total général libre : '}
               {formatPoints(totalPoints)}
             </p>
           </>
