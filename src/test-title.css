@@ -41,5 +41,6 @@ body,
 }
 
 .preview-zone .second-page .exercise-list {
+  gap: 0;
   transform: none;
 }
