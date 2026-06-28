@@ -3,15 +3,27 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
 const DEFAULT_EXERCISES = [
-  { id: 'ex1', title: 'Exercice 1', points: '6 Pts', image: null, size: 80, zoom: 100, x: 0, y: 0 },
-  { id: 'ex2', title: 'Exercice 2', points: '- Pts', image: null, size: 0, zoom: 100, x: 0, y: 0 },
-  { id: 'ex3', title: 'Exercice 3', points: '- Pts', image: null, size: 0, zoom: 100, x: 0, y: 0 },
+  { id: 'ex1', title: 'Exercice 1', points: 5, image: null, size: 80, zoom: 100, x: 0, y: 0 },
+  { id: 'ex2', title: 'Exercice 2', points: 5, image: null, size: 0, zoom: 100, x: 0, y: 0 },
+  { id: 'ex3', title: 'Exercice 3', points: 5, image: null, size: 0, zoom: 100, x: 0, y: 0 },
 ];
 
 const DURATION_OPTIONS = ['30 min', '1 h', '1 h 30', '2 h', '2 h 30', '3 h'];
 const DEFAULT_DURATION_INDEX = 3;
+const POINT_STEP = 0.25;
+const MIN_POINTS = 1;
+const MAX_POINTS = 20;
 
 const clamp = (value, min, max) => Math.min(Math.max(Number(value), min), max);
+
+const formatPoints = (value) => {
+  const rounded = Math.round(Number(value) * 100) / 100;
+  const text = Number.isInteger(rounded)
+    ? String(rounded)
+    : String(rounded).replace('.', ',');
+
+  return `${text} ${rounded === 1 ? 'Point' : 'Points'}`;
+};
 
 const getTitleFontSize = (text) => {
   const length = text.trim().length;
@@ -50,6 +62,23 @@ function App() {
   const updateExercise = (id, field, value) => {
     setExercises((items) =>
       items.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+    );
+  };
+
+  const changeExercisePoints = (id, step) => {
+    setExercises((items) =>
+      items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              points: clamp(
+                Math.round((item.points + step * POINT_STEP) * 100) / 100,
+                MIN_POINTS,
+                MAX_POINTS
+              ),
+            }
+          : item
+      )
     );
   };
 
@@ -179,7 +208,7 @@ function App() {
         <p className="eyebrow">A4 Exam Maker</p>
         <h1>Créer une feuille A4 avec entête fixe</h1>
         <p className="intro">
-          Entête en 3 cases : classe/durée à gauche, titre au milieu, professeur à droite.
+          Les points se règlent avec - et + par pas de 0,25. Par défaut : 5 points.
         </p>
 
         <div className="form-group">
@@ -244,10 +273,25 @@ function App() {
               </div>
               <div>
                 <label>Points</label>
-                <input
-                  value={exercise.points}
-                  onChange={(e) => updateExercise(exercise.id, 'points', e.target.value)}
-                />
+                <div className="points-control">
+                  <button
+                    type="button"
+                    onClick={() => changeExercisePoints(exercise.id, -1)}
+                    disabled={exercise.points <= MIN_POINTS}
+                    aria-label={`Diminuer les points de ${exercise.title}`}
+                  >
+                    −
+                  </button>
+                  <strong>{formatPoints(exercise.points)}</strong>
+                  <button
+                    type="button"
+                    onClick={() => changeExercisePoints(exercise.id, 1)}
+                    disabled={exercise.points >= MAX_POINTS}
+                    aria-label={`Augmenter les points de ${exercise.title}`}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -349,7 +393,7 @@ function App() {
                 style={{ height: `${exerciseHeights[index]}px` }}
               >
                 <div className="exercise-title">
-                  {exercise.title} : * ( {exercise.points} ) *
+                  {exercise.title} : * ( {formatPoints(exercise.points)} ) *
                 </div>
                 <div className="exercise-body">
                   {exercise.image ? (
