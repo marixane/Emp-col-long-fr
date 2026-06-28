@@ -28,7 +28,8 @@ body {
 }
 
 .form-group,
-.exercise-control {
+.exercise-control,
+.photo-controls {
   margin-top: 14px;
 }
 
@@ -36,6 +37,12 @@ label {
   display: block;
   font-weight: bold;
   margin-bottom: 5px;
+}
+
+small {
+  display: block;
+  color: #555;
+  margin-bottom: 8px;
 }
 
 input,
@@ -188,6 +195,7 @@ button {
   width: auto;
   height: auto;
   object-fit: contain;
+  transform-origin: center center;
 }
 
 .empty-zone {
