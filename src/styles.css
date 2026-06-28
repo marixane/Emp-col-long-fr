@@ -430,6 +430,7 @@ button:disabled {
   min-width: 66px;
   text-align: center;
   font-size: 14px;
+  color: #777;
 }
 
 .exercise-body {
