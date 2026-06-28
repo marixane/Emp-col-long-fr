@@ -1,0 +1,27 @@
+.exam-exercise {
+  border: 2px solid #111;
+  border-radius: 8px;
+  padding: 22px 14px 12px;
+}
+
+.exercise-title {
+  border: 2px solid #111;
+  border-radius: 8px;
+  padding: 2px 10px;
+}
+
+.exercise-title-controls {
+  gap: 4px;
+  padding: 2px 8px;
+}
+
+.exercise-title-controls button {
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+}
+
+.exercise-title-controls strong {
+  min-width: 62px;
+  font-size: 13px;
+}
