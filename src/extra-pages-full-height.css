@@ -16,3 +16,19 @@
 .preview-zone .second-page .exam-exercise:last-child {
   flex: 1 1 auto !important;
 }
+
+.preview-zone .a4-page.exam-page:not(.second-page) .exercise-list {
+  height: 994px !important;
+  min-height: 994px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+.preview-zone .a4-page.exam-page:not(.second-page) .exam-exercise {
+  flex: 0 0 auto;
+}
+
+.preview-zone .a4-page.exam-page:not(.second-page) .exam-exercise:last-child {
+  flex: 1 1 auto !important;
+}
