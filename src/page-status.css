@@ -74,6 +74,10 @@
   color: #334155 !important;
 }
 
+.exam-page.is-exporting:not(.no-pdf-lines) .exercise-body {
+  background: repeating-linear-gradient(white 0px, white 28px, #ddd 29px) !important;
+}
+
 .exam-page.is-exporting.no-pdf-lines .exercise-body {
   background: #ffffff !important;
 }
