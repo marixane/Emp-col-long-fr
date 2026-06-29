@@ -8,7 +8,7 @@ const TOTAL = 20;
 const H1 = 990;
 const HN = 840;
 const MIN_H = 120;
-const DURATIONS = ['30 min', '1 h', '1 h 30', '2 h', '2 h 30', '3 h'];
+const DURATIONS = ['30 min', '1 h', '1 h 30', '2 h', '2 h 30', '3 h', '3 h 30', '4 h'];
 const IND_TITLE = 'Devoir individuel de Mathématique\nN°: 1 Semestre: 1';
 const HOME_TITLE = 'Devoir à la maison de Mathématique\nN°: 1 Semestre: 1';
 
