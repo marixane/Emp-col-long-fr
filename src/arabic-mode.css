@@ -23,6 +23,8 @@ body.arabic-mode .exam-page.has-bar-ribbon .exercise-body::before {
   right: -4mm !important;
   width: 33px !important;
   background: #eeeeee !important;
+  border-left: 0 !important;
+  border-right: 2px solid #111111 !important;
   z-index: 46 !important;
 }
 
