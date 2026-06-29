@@ -57,3 +57,55 @@ body,
   font-weight: 700;
   color: #777;
 }
+
+.exercise-count-section {
+  margin: 16px 0;
+}
+
+.exercise-count-section h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.page-count-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.page-count-card {
+  border: 2px solid #d7d7d7;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+}
+
+.page-count-card label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.page-count-card .compact-control {
+  display: grid;
+  grid-template-columns: 34px 1fr 34px;
+  gap: 6px;
+  align-items: center;
+}
+
+.page-count-card .compact-control button {
+  width: 34px;
+  height: 34px;
+}
+
+.page-count-card .compact-control strong {
+  border: 2px solid #d7d7d7;
+  border-radius: 8px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
