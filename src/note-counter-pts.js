@@ -1,15 +1,34 @@
+function parsePointText(text) {
+  var match = String(text || '').match(/([0-9]+(?:[,.][0-9]+)?)/);
+  return match ? Number(match[1].replace(',', '.')) : 0;
+}
+
+function formatPts(value) {
+  var rounded = Math.round(value * 100) / 100;
+  var text = Number.isInteger(rounded) ? String(rounded) : String(rounded).replace('.', ',');
+  return 'Total : ' + text + ' Pts';
+}
+
+function readVisibleTotal() {
+  var sum = 0;
+  document.querySelectorAll('.exam-exercise:not(.blank-exercise) .exercise-title-controls strong').forEach(function (node) {
+    sum += parsePointText(node.textContent);
+  });
+  return Math.round(sum * 100) / 100;
+}
+
 function simplifyNoteCounter() {
+  var total = readVisibleTotal();
   document.querySelectorAll('.note-scale-counter').forEach(function (counter) {
-    var text = counter.textContent || '';
-    var match = text.match(/Total\s*:\s*([0-9]+(?:[,.][0-9]+)?)/i);
-    if (!match) return;
-    counter.textContent = 'Total : ' + match[1].replace('.', ',') + ' Pts';
+    var next = formatPts(total);
+    if (counter.textContent !== next) counter.textContent = next;
   });
 }
 
 simplifyNoteCounter();
 setTimeout(simplifyNoteCounter, 100);
 setTimeout(simplifyNoteCounter, 400);
+setInterval(simplifyNoteCounter, 250);
 
 new MutationObserver(function () {
   simplifyNoteCounter();
