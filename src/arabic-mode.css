@@ -56,7 +56,7 @@ body.arabic-mode .exam-page.has-bar-ribbon .bar-mark {
   right: 2px !important;
 }
 
-body.arabic-mode .exercise-title {
-  right: auto !important;
-  left: 12px !important;
+body.arabic-mode .exam-page .exercise-title {
+  left: auto !important;
+  right: 12px !important;
 }
