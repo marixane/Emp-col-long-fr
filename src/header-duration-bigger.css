@@ -4,6 +4,7 @@
   align-items: center !important;
   justify-content: center !important;
   text-align: center !important;
+  position: relative !important;
 }
 
 .class-duration-header .inline-class-input {
@@ -28,19 +29,27 @@
 .exam-page.is-exporting .class-duration-header {
   display: flex !important;
   flex-direction: column !important;
-  align-items: center !important;
+  align-items: stretch !important;
   justify-content: center !important;
+  text-align: center !important;
+  position: relative !important;
+}
+
+.exam-page.is-exporting .class-duration-header .inline-class-input {
+  width: 100% !important;
   text-align: center !important;
 }
 
 .exam-page.is-exporting .tiny-duration-control {
+  position: relative !important;
+  left: 50% !important;
   width: 170px !important;
   max-width: 170px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  align-self: center !important;
-  justify-self: center !important;
-  transform: translateX(0) !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  align-self: flex-start !important;
+  justify-self: auto !important;
+  transform: translateX(-50%) !important;
 }
 
 .tiny-duration-control button {
