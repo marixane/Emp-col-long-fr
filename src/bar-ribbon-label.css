@@ -1,7 +1,7 @@
 .exam-page.has-bar-ribbon .exercise-body::after {
   content: 'Barème';
   position: absolute;
-  left: -2px;
+  left: calc(-2px + 1mm);
   top: 18px;
   width: 25px;
   color: #111111;
