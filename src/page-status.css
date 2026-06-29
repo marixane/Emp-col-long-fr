@@ -74,11 +74,11 @@
 
 .split-title-cell .title-line {
   width: 100% !important;
-  min-height: 24px !important;
-  height: 24px !important;
+  min-height: 28px !important;
+  height: 28px !important;
   padding: 0 4px !important;
   margin: 0 !important;
-  line-height: 24px !important;
+  line-height: 28px !important;
   text-align: center !important;
   resize: none !important;
   overflow: visible !important;
@@ -89,15 +89,15 @@
 }
 
 .split-title-cell .title-line-top {
-  font-size: 16px !important;
+  font-size: 17px !important;
 }
 
 .split-title-cell .title-line-middle {
-  font-size: 16px !important;
+  font-size: 17px !important;
 }
 
 .split-title-cell .title-line-bottom {
-  font-size: 13px !important;
+  display: none !important;
 }
 
 .exam-page.is-exporting .split-title-cell {
@@ -107,10 +107,14 @@
 }
 
 .exam-page.is-exporting .split-title-cell .title-line {
-  height: 24px !important;
-  min-height: 24px !important;
-  line-height: 24px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  line-height: 28px !important;
   overflow: visible !important;
+}
+
+.exam-page.is-exporting .split-title-cell .title-line-bottom {
+  display: none !important;
 }
 
 .total-mode-control {
