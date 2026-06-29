@@ -4,12 +4,12 @@
 }
 
 .exercise-title-controls button {
-  position: relative !important;
-  top: 32px !important;
+  position: absolute !important;
+  top: 40px !important;
   z-index: 20 !important;
   width: 32px !important;
   height: 28px !important;
-  margin: 0 5px !important;
+  margin: 0 !important;
   background: #eff6ff !important;
   color: #1d4ed8 !important;
   border: 2px solid #bfdbfe !important;
@@ -18,6 +18,14 @@
   font-weight: 900 !important;
   line-height: 20px !important;
   box-shadow: none !important;
+}
+
+.exercise-title-controls button:first-of-type {
+  left: 200px !important;
+}
+
+.exercise-title-controls button:last-of-type {
+  left: 246px !important;
 }
 
 .exercise-title-controls button:disabled {
