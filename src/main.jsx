@@ -44,6 +44,7 @@ import './export-pdf-clear.js';
 import './discreet-exercise-points.css';
 import './discreet-duration-control.css';
 import './fix-points-parentheses.js';
+import './pdf-exercise-points-clean.css';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
