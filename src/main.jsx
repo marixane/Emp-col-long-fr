@@ -54,5 +54,6 @@ import './arabic-mode.css';
 import './arabic-mode.js';
 import './a4-overview.js';
 import './active-settings-green.css';
+import './arabic-toggle-label-bigger.css';
 
 createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>);
