@@ -3,10 +3,15 @@
   background: #ffffff !important;
   border: 1px solid #d1d5db !important;
   box-shadow: 0 0 0 1px #ffffff !important;
-  z-index: 35 !important;
+  z-index: 18 !important;
   cursor: move !important;
   pointer-events: auto !important;
   user-select: none !important;
+}
+
+.bar-mark,
+.bar-buttons {
+  z-index: 35 !important;
 }
 
 .mask-delete-button {
