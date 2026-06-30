@@ -22,10 +22,13 @@ const AR_HEADER = {
 
 const DURATION_FR_TO_AR = {
   '30 min': '30 د',
+  '1 h': '1 س',
+  '1 h 30': '1 س 30 د',
   '2 h': '2 س',
   '2 h 30': '2 س 30 د',
   '3 h': '3 س',
-  '3 h 30': '3 س 30 د'
+  '3 h 30': '3 س 30 د',
+  '4 h': '4 س'
 };
 
 const DURATION_AR_TO_FR = Object.fromEntries(
