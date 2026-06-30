@@ -10,6 +10,7 @@ const MIN_H = 120;
 const MIN_H_EXTRA = Number('5');
 const DURATIONS = ['30 min', '1 h', '1 h 30', '2 h', '2 h 30', '3 h', '3 h 30', '4 h'];
 const BAR_POINTS = ['0,25', '0,75', '1,25', '1,75', '2,25', '2,75', '0,5', '1', '1,5', '2', '2,5', '3'];
+const BAR_MARK_BOTTOM_GAP = 18;
 const IND_TITLE_TOP = 'Devoir individuel';
 const HOME_TITLE_TOP = 'Devoir à la maison';
 const TITLE_MIDDLE = 'Mathématique';
@@ -18,6 +19,7 @@ const RIGHT_TITLE_TOP = 'Lycée El jamai ,Tanger';
 const RIGHT_TITLE_BOTTOM = 'N° : 1 Semestre : 1';
 
 const clamp = (v, a, b) => Math.min(Math.max(Number(v), a), b);
+const clampBarMarkY = (y, h) => clamp(y, 0, Math.max(0, Number(h || 0) - BAR_MARK_BOTTOM_GAP));
 const textWeight = (text) => Array.from(String(text ?? '').trim()).reduce((sum, ch) => {
   if (ch === ' ') return sum + 0.35;
   if (',.;:!|'.includes(ch)) return sum + 0.25;
@@ -181,7 +183,8 @@ export default function App6() {
     const e = pages[page].find((item) => item.id === id);
     if (!e || !canAddBarPoint(e, label)) return;
     const index = e.barMarks?.length ?? 0;
-    updateEx(page, id, { barMarks: [...(e.barMarks ?? []), { id: `bar-${Date.now()}-${Math.random()}`, label, x: 0, y: 34 + index * 26 }] });
+    const h = hs[page]?.[pages[page].findIndex((item) => item.id === id)] ?? 600;
+    updateEx(page, id, { barMarks: [...(e.barMarks ?? []), { id: `bar-${Date.now()}-${Math.random()}`, label, x: 0, y: clampBarMarkY(34 + index * 26, h) }] });
   };
   const deleteBarMark = (page, exId, markId) => {
     const e = pages[page].find((item) => item.id === exId);
@@ -192,7 +195,7 @@ export default function App6() {
     const h = hs[page]?.[pages[page].findIndex((item) => item.id === exId)] ?? 600;
     setPages((cur) => cur.map((p, pi) => pi === page ? p.map((e) => e.id === exId ? {
       ...e,
-      barMarks: (e.barMarks ?? []).map((m) => m.id === markId ? { ...m, x: clamp(updates.x ?? m.x, -4, 705), y: clamp(updates.y ?? m.y, 0, Math.max(0, h - 42)) } : m),
+      barMarks: (e.barMarks ?? []).map((m) => m.id === markId ? { ...m, x: clamp(updates.x ?? m.x, -4, 705), y: clampBarMarkY(updates.y ?? m.y, h) } : m),
     } : e) : p));
   };
   const startPhotoDrag = (ev, page, e) => {
@@ -243,6 +246,10 @@ export default function App6() {
     const safe = clamp(dy, min, max);
     const next = resize.start.map((h, i) => i === resize.upper ? Math.round(h + safe) : i === resize.lower ? Math.round(h - safe) : h);
     setHs((cur) => cur.map((p, i) => i === resize.page ? next : p));
+    setPages((cur) => cur.map((p, pi) => pi === resize.page ? p.map((e, ei) => ({
+      ...e,
+      barMarks: (e.barMarks ?? []).map((m) => ({ ...m, y: clampBarMarkY(m.y ?? 34, next[ei] ?? 0) })),
+    })) : p));
   };
   const stopMove = () => {
     setDrag(null);
