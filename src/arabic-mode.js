@@ -6,7 +6,7 @@ const FR_HEADER = {
   individualTitle: 'Devoir individuel',
   freeTitle: 'Devoir libre',
   homeworkTitle: 'Devoir à la maison',
-  subject: 'Mathématique',
+  subject: 'N° : 1 Semestre : 1',
   level: 'Classe : 2 Bac SPF'
 };
 
@@ -61,7 +61,7 @@ function syncHeaderLanguage() {
   var titleMiddle = document.querySelector('.title-line-middle');
   if (titleMiddle) {
     var currentMiddle = titleMiddle.value || '';
-    var isSubject = currentMiddle === FR_HEADER.subject || currentMiddle === 'الرياضيات' || currentMiddle === AR_HEADER.subject;
+    var isSubject = currentMiddle === 'Mathématique' || currentMiddle === FR_HEADER.subject || currentMiddle === 'الرياضيات' || currentMiddle === AR_HEADER.subject;
     if (isSubject) setInputValue('.title-line-middle', header.subject);
   }
 }
