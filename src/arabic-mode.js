@@ -2,6 +2,7 @@ window.__examLanguage = window.__examLanguage || localStorage.getItem('examLangu
 
 const FR_HEADER = {
   rightTop: 'Lycée El jamai ,Tanger',
+  rightBottom: 'N° : 1 Semestre : 1',
   individualTitle: 'Devoir individuel',
   subject: 'Mathématique',
   level: 'Classe : 2 Bac SPF'
@@ -9,6 +10,7 @@ const FR_HEADER = {
 
 const AR_HEADER = {
   rightTop: 'ثانوية الجامعي، طنجة',
+  rightBottom: 'مادة : الرياضيات',
   individualTitle: 'فرض محروس',
   subject: 'رقم 1 الدورة 1',
   level: 'قسم : 2 باك ع.ف'
@@ -26,6 +28,13 @@ function setInputValue(selector, value) {
 function syncHeaderLanguage() {
   var header = window.__examLanguage === 'ar' ? AR_HEADER : FR_HEADER;
   setInputValue('.right-line-top', header.rightTop);
+
+  var rightBottom = document.querySelector('.right-line-bottom');
+  if (rightBottom) {
+    var currentRightBottom = rightBottom.value || '';
+    var isRightBottom = currentRightBottom === FR_HEADER.rightBottom || currentRightBottom === AR_HEADER.rightBottom;
+    if (isRightBottom) setInputValue('.right-line-bottom', header.rightBottom);
+  }
 
   var levelInput = document.querySelector('.inline-class-input');
   if (levelInput) {
