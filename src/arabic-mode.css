@@ -81,9 +81,9 @@ body.arabic-mode .exam-page .exercise-title {
 }
 
 body.arabic-mode .resize-handle {
-  left: 0 !important;
-  right: auto !important;
-  transform: translateX(-50%) scaleX(-1) !important;
+  left: auto !important;
+  right: 0 !important;
+  transform: translateX(50%) scaleX(-1) !important;
 }
 
 body.arabic-mode .exercise-title-controls {
