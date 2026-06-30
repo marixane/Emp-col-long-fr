@@ -35,11 +35,6 @@ const DURATION_AR_TO_FR = Object.fromEntries(
   Object.entries(DURATION_FR_TO_AR).map(([fr, ar]) => [ar, fr])
 );
 
-function setText(node, value) {
-  if (!node || node.textContent === value) return;
-  node.textContent = value;
-}
-
 function setInputValue(selector, value) {
   var input = document.querySelector(selector);
   if (!input || input.value === value) return;
@@ -97,43 +92,10 @@ function setIndividualHeaderTitle(isActive) {
 }
 
 function syncPanelLabels() {
-  var isArabic = window.__examLanguage === 'ar';
-
   var notesTitle = document.querySelector('.note-scale-title');
-  setText(notesTitle, isArabic ? 'النقط :' : 'Notes :');
-
-  var linesButton = document.querySelector('.pdf-lines-toggle');
-  if (linesButton) {
-    var linesVisible = linesButton.classList.contains('on');
-    setText(linesButton, isArabic
-      ? (linesVisible ? 'أسطر ظاهرة في PDF' : 'أسطر مخفية في PDF')
-      : (linesVisible ? 'Lignes visibles dans le PDF' : 'Lignes masquées dans le PDF'));
+  if (notesTitle) {
+    notesTitle.textContent = window.__examLanguage === 'ar' ? 'النقط :' : 'Notes :';
   }
-
-  var barButton = document.querySelector('.bar-ribbon-toggle');
-  if (barButton) {
-    var barVisible = barButton.classList.contains('on');
-    setText(barButton, isArabic
-      ? (barVisible ? 'سُلَّم التنقيط ظاهر' : 'سُلَّم التنقيط مخفي')
-      : (barVisible ? 'Ruban de barème visible' : 'Ruban de barème masqué'));
-  }
-
-  var totalCounter = document.querySelector('.note-scale-counter');
-  if (totalCounter) {
-    var totalText = totalCounter.textContent || '';
-    var nextTotalText = totalText
-      .replace(/^Total\s*:/, isArabic ? 'المجموع :' : 'Total :')
-      .replace(/^المجموع\s*:/, isArabic ? 'المجموع :' : 'Total :');
-    setText(totalCounter, nextTotalText);
-  }
-
-  document.querySelectorAll('.page-number').forEach(function (pageNumber) {
-    var pageText = pageNumber.textContent || '';
-    var nextPageText = pageText
-      .replace(/^Page\s+/, isArabic ? 'الصفحة ' : 'Page ')
-      .replace(/^الصفحة\s+/, isArabic ? 'الصفحة ' : 'Page ');
-    setText(pageNumber, nextPageText);
-  });
 }
 
 function syncLanguageButton() {
@@ -177,17 +139,17 @@ function syncLanguageButton() {
 
   var isActive = document.body.classList.contains('no-title-points');
   individualButton.classList.toggle('active', !isActive);
-  setText(individualButton, window.__examLanguage === 'ar'
+  individualButton.textContent = window.__examLanguage === 'ar'
     ? (isActive ? 'فرض\nمنزلي' : 'فرض\nمحروس')
-    : (isActive ? 'Devoir\nlibre' : 'Devoir\nindividuel'));
-  setText(button, window.__examLanguage === 'ar' ? 'Français' : 'العربية');
+    : (isActive ? 'Devoir\nlibre' : 'Devoir\nindividuel');
+  button.textContent = window.__examLanguage === 'ar' ? 'Français' : 'العربية';
 }
 
 function syncDurationLabels() {
   document.querySelectorAll('.tiny-duration-control strong').forEach(function (duration) {
     var text = (duration.textContent || '').trim();
     var next = window.__examLanguage === 'ar' ? DURATION_FR_TO_AR[text] : DURATION_AR_TO_FR[text];
-    if (next) setText(duration, next);
+    if (next) duration.textContent = next;
   });
 }
 
@@ -206,17 +168,6 @@ function bindDurationButtons() {
   });
 }
 
-function bindPanelButtons() {
-  document.querySelectorAll('.pdf-lines-toggle, .bar-ribbon-toggle').forEach(function (button) {
-    if (button.dataset.panelSyncBound === 'true') return;
-    button.dataset.panelSyncBound = 'true';
-    button.addEventListener('click', function () {
-      setTimeout(syncPanelLabels, 0);
-      setTimeout(syncPanelLabels, 40);
-    });
-  });
-}
-
 function syncExerciseTitles() {
   document.querySelectorAll('.exam-exercise:not(.blank-exercise) .exercise-title-controls > span:first-child').forEach(function (span) {
     var controls = span.closest('.exercise-title-controls');
@@ -227,7 +178,7 @@ function syncExerciseTitles() {
     var next = window.__examLanguage === 'ar'
       ? '\u062a\u0645\u0631\u064a\u0646 ' + match[1] + (isHomeworkTitle ? '' : ' :')
       : 'Exercice ' + match[1] + (isHomeworkTitle ? '' : ' :');
-    setText(span, next);
+    if (span.textContent !== next) span.textContent = next;
   });
 }
 
@@ -238,30 +189,20 @@ function syncLanguageMode() {
   syncPanelLabels();
   syncHeaderLanguage();
   bindDurationButtons();
-  bindPanelButtons();
   scheduleDurationSync();
   syncExerciseTitles();
   if (typeof formatExercisePointLabels === 'function') formatExercisePointLabels();
-}
-
-var queuedLanguageSync = false;
-function queueLanguageSync() {
-  if (queuedLanguageSync) return;
-  queuedLanguageSync = true;
-  requestAnimationFrame(function () {
-    queuedLanguageSync = false;
-    syncLanguageButton();
-    syncPanelLabels();
-    syncHeaderLanguage();
-    bindDurationButtons();
-    bindPanelButtons();
-    syncDurationLabels();
-    syncExerciseTitles();
-  });
 }
 
 syncLanguageMode();
 setTimeout(syncLanguageMode, 100);
 setTimeout(syncLanguageMode, 400);
 
-new MutationObserver(queueLanguageSync).observe(document.body, { childList: true, subtree: true });
+new MutationObserver(function () {
+  syncLanguageButton();
+  syncPanelLabels();
+  syncHeaderLanguage();
+  bindDurationButtons();
+  scheduleDurationSync();
+  syncExerciseTitles();
+}).observe(document.body, { childList: true, subtree: true });
