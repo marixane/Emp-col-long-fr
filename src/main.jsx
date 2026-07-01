@@ -55,6 +55,7 @@ import './bar-ribbon-label.css';
 import './arabic-mode.css';
 import './arabic-mode.js';
 import './arabic-duration-stable.js';
+import './resize-handle-hover-indicator.css';
 // import './a4-overview.js';
 import './active-settings-green.css';
 import './arabic-toggle-label-bigger.css';
