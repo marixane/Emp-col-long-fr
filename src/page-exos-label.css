@@ -1,0 +1,3 @@
+.page-count-card strong:not([data-exos-label-ready="true"]) {
+  visibility: hidden !important;
+}
