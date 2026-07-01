@@ -9,7 +9,7 @@ function updatePageExosLabels() {
     if (!match) return;
 
     var number = match[0];
-    value.textContent = window.__examLanguage === 'ar' ? 'ت ' + number : number + ' Exos';
+    value.textContent = window.__examLanguage === 'ar' ? number + ' ت' : number + ' Exos';
     value.setAttribute('data-exos-label-ready', 'true');
   });
 }
