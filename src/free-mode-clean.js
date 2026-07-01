@@ -1,5 +1,4 @@
 var previousTitleMode = null;
-var activateBarOnceOnIndividualClick = false;
 
 function getTitleModeValue() {
   var title = document.querySelector('.title-line-top');
@@ -20,15 +19,36 @@ function isFreeModeActive() {
   return getTitleModeKind() === 'free';
 }
 
-function isIndividualModeActive() {
-  return getTitleModeKind() === 'individual';
-}
-
 function isIndividualButton(node) {
   var button = node && node.closest && node.closest('button');
   if (!button) return false;
   var text = (button.textContent || '').replace(/\s+/g, ' ').trim();
-  return text === 'Individuel' || text === 'Devoir individuel' || text === 'فرض محروس';
+  return button.classList.contains('individual-toggle') || text === 'Individuel' || text === 'Devoir individuel' || text === 'فرض محروس' || text.indexOf('individuel') !== -1 || text.indexOf('محروس') !== -1;
+}
+
+function activateBarRibbonOnce() {
+  if (isFreeModeActive()) return;
+  var button = document.querySelector('.bar-ribbon-toggle');
+  if (!button) return;
+
+  button.disabled = false;
+  button.removeAttribute('aria-disabled');
+  button.style.pointerEvents = '';
+  button.style.opacity = '';
+  button.style.cursor = '';
+  button.title = '';
+
+  if (button.classList.contains('off')) {
+    button.click();
+  }
+}
+
+function activateBarRibbonOnceWithRetries() {
+  setTimeout(activateBarRibbonOnce, 0);
+  setTimeout(activateBarRibbonOnce, 60);
+  setTimeout(activateBarRibbonOnce, 150);
+  setTimeout(activateBarRibbonOnce, 350);
+  setTimeout(activateBarRibbonOnce, 700);
 }
 
 function updateDisplay(node, hidden) {
@@ -47,17 +67,14 @@ function syncFreeModeBarRibbon(freeMode) {
   if (!button) return;
 
   var currentMode = getTitleModeKind();
-  var shouldActivateOnce = currentMode === 'individual' && (activateBarOnceOnIndividualClick || previousTitleMode === 'free');
 
   if (freeMode && button.classList.contains('on')) {
     button.click();
   }
 
-  if (shouldActivateOnce && button.classList.contains('off')) {
-    button.click();
+  if (currentMode === 'individual' && previousTitleMode === 'free') {
+    activateBarRibbonOnce();
   }
-
-  if (currentMode === 'individual') activateBarOnceOnIndividualClick = false;
 
   button.disabled = !!freeMode;
   button.setAttribute('aria-disabled', freeMode ? 'true' : 'false');
@@ -99,7 +116,9 @@ setTimeout(syncFreeModeClean, 700);
 window.setInterval(syncFreeModeClean, 400);
 
 document.addEventListener('click', function (event) {
-  if (isIndividualButton(event.target)) activateBarOnceOnIndividualClick = true;
+  if (isIndividualButton(event.target)) {
+    activateBarRibbonOnceWithRetries();
+  }
   setTimeout(syncFreeModeClean, 20);
   setTimeout(syncFreeModeClean, 80);
   setTimeout(syncFreeModeClean, 250);
@@ -113,3 +132,4 @@ document.addEventListener('input', function () {
 window.cleanFreeModeExerciseTitles = cleanFreeModeExerciseTitles;
 window.syncFreeModeBodyClass = syncFreeModeBodyClass;
 window.syncFreeModeBarRibbon = syncFreeModeBarRibbon;
+window.activateBarRibbonOnce = activateBarRibbonOnce;
