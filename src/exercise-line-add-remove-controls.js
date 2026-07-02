@@ -9,7 +9,16 @@ function getVisibleExerciseCount(pageIndex) {
   return match ? Number(match[0]) : 0;
 }
 
+function getRealExerciseCount(pageIndex) {
+  var pageNode = document.querySelectorAll('.a4-page')[pageIndex];
+  if (!pageNode) return getVisibleExerciseCount(pageIndex);
+  return Array.from(pageNode.querySelectorAll('.exam-exercise')).filter(function (exercise) {
+    return !exercise.classList.contains('blank-exercise');
+  }).length;
+}
+
 function clickExerciseCountButton(pageIndex, wanted) {
+  var before = getRealExerciseCount(pageIndex);
   var card = getPageCards()[pageIndex];
   if (!card) return false;
   var buttons = Array.from(card.querySelectorAll('.compact-control button'));
@@ -19,8 +28,15 @@ function clickExerciseCountButton(pageIndex, wanted) {
   });
   if (!button) return false;
   button.click();
-  setTimeout(syncExerciseLineControls, 90);
-  setTimeout(syncExerciseLineControls, 220);
+  setTimeout(syncExerciseLineControls, 70);
+  setTimeout(syncExerciseLineControls, 160);
+
+  if ((wanted === '-' || wanted === '−') && before === 1) {
+    setTimeout(function () {
+      if (getRealExerciseCount(pageIndex) !== 0) clickExerciseCountButton(pageIndex, '-');
+    }, 80);
+  }
+
   return true;
 }
 
@@ -84,9 +100,10 @@ function syncExerciseLineControls() {
 
     var controls = makeExerciseLineControls(pageIndex);
     var count = getVisibleExerciseCount(pageIndex);
+    var realCount = visibleExercises.length;
     var minus = controls.querySelector('.minus');
     var plus = controls.querySelector('.plus');
-    if (minus) minus.disabled = count <= 0;
+    if (minus) minus.disabled = realCount <= 0;
     if (plus) plus.disabled = count >= 6 || (pageIndex > 0 && getVisibleExerciseCount(0) === 0);
 
     target.appendChild(controls);
