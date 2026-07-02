@@ -201,7 +201,7 @@ function applyMobilePhoneForce() {
         align-items: flex-start !important;
         justify-content: flex-start !important;
         justify-items: start !important;
-        gap: 18px !important;
+        gap: 6px !important;
         padding: 8px 0 40px 6px !important;
         margin: 0 !important;
         overflow: auto !important;
@@ -215,9 +215,14 @@ function applyMobilePhoneForce() {
       body .a4-page {
         transform: scale(0.52) !important;
         transform-origin: top left !important;
-        margin: 0 0 -375px 0 !important;
+        margin: 0 0 -525px 0 !important;
         flex: 0 0 auto !important;
         translate: 0 0 !important;
+      }
+
+      body .preview-zone .a4-page:last-child,
+      body .a4-page:last-child {
+        margin-bottom: 40px !important;
       }
     }
 
@@ -225,7 +230,12 @@ function applyMobilePhoneForce() {
       body .preview-zone .a4-page,
       body .a4-page {
         transform: scale(0.50) !important;
-        margin-bottom: -400px !important;
+        margin-bottom: -540px !important;
+      }
+
+      body .preview-zone .a4-page:last-child,
+      body .a4-page:last-child {
+        margin-bottom: 40px !important;
       }
     }
   `;
