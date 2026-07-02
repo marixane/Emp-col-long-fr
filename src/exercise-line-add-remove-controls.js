@@ -9,13 +9,6 @@ function getVisibleExerciseCount(pageIndex) {
   return match ? Number(match[0]) : 0;
 }
 
-function refreshExerciseControlsSoon() {
-  if (window.requestAnimationFrame) window.requestAnimationFrame(syncExerciseLineControls);
-  setTimeout(syncExerciseLineControls, 40);
-  setTimeout(syncExerciseLineControls, 120);
-  setTimeout(syncExerciseLineControls, 260);
-}
-
 function clickExerciseCountButton(pageIndex, wanted) {
   var card = getPageCards()[pageIndex];
   if (!card) return false;
@@ -26,7 +19,8 @@ function clickExerciseCountButton(pageIndex, wanted) {
   });
   if (!button) return false;
   button.click();
-  refreshExerciseControlsSoon();
+  setTimeout(syncExerciseLineControls, 90);
+  setTimeout(syncExerciseLineControls, 220);
   return true;
 }
 
@@ -100,7 +94,7 @@ function syncExerciseLineControls() {
 }
 
 syncExerciseLineControls();
-setTimeout(syncExerciseLineControls, 150);
-setTimeout(syncExerciseLineControls, 500);
-setInterval(syncExerciseLineControls, 1000);
+setTimeout(syncExerciseLineControls, 200);
+setTimeout(syncExerciseLineControls, 700);
+setInterval(syncExerciseLineControls, 1200);
 window.addEventListener('resize', syncExerciseLineControls);
