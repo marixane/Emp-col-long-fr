@@ -11,11 +11,9 @@ function getVisibleExerciseCount(pageIndex) {
 
 function refreshExerciseControlsSoon() {
   if (window.requestAnimationFrame) window.requestAnimationFrame(syncExerciseLineControls);
-  setTimeout(syncExerciseLineControls, 0);
-  setTimeout(syncExerciseLineControls, 30);
-  setTimeout(syncExerciseLineControls, 80);
-  setTimeout(syncExerciseLineControls, 150);
-  setTimeout(syncExerciseLineControls, 300);
+  setTimeout(syncExerciseLineControls, 40);
+  setTimeout(syncExerciseLineControls, 120);
+  setTimeout(syncExerciseLineControls, 260);
 }
 
 function clickExerciseCountButton(pageIndex, wanted) {
@@ -101,18 +99,8 @@ function syncExerciseLineControls() {
   });
 }
 
-function observeExerciseChanges() {
-  if (window.exerciseLineControlsObserver || !document.body || !window.MutationObserver) return;
-  window.exerciseLineControlsObserver = new MutationObserver(function () {
-    refreshExerciseControlsSoon();
-  });
-  window.exerciseLineControlsObserver.observe(document.body, { childList: true, subtree: true });
-}
-
 syncExerciseLineControls();
-observeExerciseChanges();
-setTimeout(syncExerciseLineControls, 100);
-setTimeout(syncExerciseLineControls, 250);
-setTimeout(syncExerciseLineControls, 700);
-setInterval(syncExerciseLineControls, 300);
+setTimeout(syncExerciseLineControls, 150);
+setTimeout(syncExerciseLineControls, 500);
+setInterval(syncExerciseLineControls, 1000);
 window.addEventListener('resize', syncExerciseLineControls);
