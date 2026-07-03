@@ -43,11 +43,49 @@ function restoreBarRibbonState(wasVisible) {
   }, 140);
 }
 
-function clickNoteWithoutChangingBar(label) {
-  var wasVisible = isBarRibbonVisible();
+function getTextFieldSnapshot() {
+  return Array.from(document.querySelectorAll('.inline-title-input,.inline-prof-input,.inline-class-input')).map(function (field) {
+    return { field: field, value: field.value };
+  });
+}
+
+function setNativeValue(field, value) {
+  var setter = Object.getOwnPropertyDescriptor(field.constructor.prototype, 'value');
+  if (setter && setter.set) setter.set.call(field, value);
+  else field.value = value;
+  field.dispatchEvent(new Event('input', { bubbles: true }));
+  field.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function restoreTextFields(snapshot) {
+  snapshot.forEach(function (item) {
+    if (item.field && item.field.isConnected && item.field.value !== item.value) {
+      setNativeValue(item.field, item.value);
+    }
+  });
+}
+
+function clickNoteTotalOnly(label) {
   var current = findNoteScaleOriginal(label);
-  if (current && !current.disabled) current.click();
-  restoreBarRibbonState(wasVisible);
+  if (!current || current.disabled) return;
+  if (current.classList.contains('active')) return;
+
+  var wasVisible = isBarRibbonVisible();
+  var fields = getTextFieldSnapshot();
+  current.click();
+
+  setTimeout(function () {
+    restoreBarRibbonState(wasVisible);
+    restoreTextFields(fields);
+  }, 40);
+  setTimeout(function () {
+    restoreBarRibbonState(wasVisible);
+    restoreTextFields(fields);
+  }, 140);
+  setTimeout(function () {
+    restoreBarRibbonState(wasVisible);
+    restoreTextFields(fields);
+  }, 320);
 }
 
 function makeProxy(classes, title, text, action) {
@@ -102,13 +140,13 @@ function syncA4ProxyControls() {
 
   var original10 = findNoteScaleOriginal('/10');
   var note10 = makeProxy('a4-top-control a4-text-control a4-note10-proxy', 'Note sur 10', '/10', function () {
-    clickNoteWithoutChangingBar('/10');
+    clickNoteTotalOnly('/10');
   });
   if (note10) note10.disabled = original10 ? original10.disabled : true;
 
   var original20 = findNoteScaleOriginal('/20');
   var note20 = makeProxy('a4-top-control a4-text-control a4-note20-proxy', 'Note sur 20', '/20', function () {
-    clickNoteWithoutChangingBar('/20');
+    clickNoteTotalOnly('/20');
   });
   if (note20) note20.disabled = original20 ? original20.disabled : true;
 
