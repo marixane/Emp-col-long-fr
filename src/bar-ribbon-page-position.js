@@ -34,90 +34,31 @@ function getRealNoteScale() {
   return '/20';
 }
 
-function getCurrentNoteScale() {
-  return window.__noteScaleDesired || getRealNoteScale();
-}
-
-function isBarRibbonVisible() {
-  return !!document.querySelector('.a4-page.has-bar-ribbon');
-}
-
-function restoreBarRibbonState(wasVisible) {
-  setTimeout(function () {
-    if (isBarRibbonVisible() === wasVisible) return;
-    var b = getOriginal('.bar-ribbon-toggle');
-    if (b && !b.disabled) b.click();
-  }, 40);
-  setTimeout(function () {
-    if (isBarRibbonVisible() === wasVisible) return;
-    var b = getOriginal('.bar-ribbon-toggle');
-    if (b && !b.disabled) b.click();
-  }, 140);
-}
-
-function getTextFieldSnapshot() {
-  return Array.from(document.querySelectorAll('.inline-title-input,.inline-prof-input,.inline-class-input')).map(function (field) {
-    return { field: field, value: field.value };
-  });
-}
-
-function setNativeValue(field, value) {
-  var setter = Object.getOwnPropertyDescriptor(field.constructor.prototype, 'value');
-  if (setter && setter.set) setter.set.call(field, value);
-  else field.value = value;
-  field.dispatchEvent(new Event('input', { bubbles: true }));
-  field.dispatchEvent(new Event('change', { bubbles: true }));
-}
-
-function restoreTextFields(snapshot) {
-  snapshot.forEach(function (item) {
-    if (item.field && item.field.isConnected && item.field.value !== item.value) {
-      setNativeValue(item.field, item.value);
-    }
-  });
-}
-
 function clickNoteTotalOnly(label) {
-  var current = findNoteScaleOriginal(label);
-  if (!current || current.disabled) return false;
-
-  var wasVisible = isBarRibbonVisible();
-  var fields = getTextFieldSnapshot();
-  current.click();
-
-  setTimeout(function () {
-    restoreBarRibbonState(wasVisible);
-    restoreTextFields(fields);
-  }, 40);
-  setTimeout(function () {
-    restoreBarRibbonState(wasVisible);
-    restoreTextFields(fields);
-  }, 140);
-  setTimeout(function () {
-    restoreBarRibbonState(wasVisible);
-    restoreTextFields(fields);
-  }, 320);
+  var target = findNoteScaleOriginal(label);
+  if (!target || target.disabled) return false;
+  if (target.classList.contains('active')) return true;
+  target.click();
   return true;
 }
 
 function updateToggleButton(button, scale) {
   if (!button) return;
+  var next = scale === '/20' ? '/10' : '/20';
   button.textContent = scale;
-  button.title = 'Basculer la note ' + (scale === '/20' ? '/10' : '/20');
+  button.title = 'Basculer la note ' + next;
   button.setAttribute('aria-label', button.title);
   button.disabled = false;
 }
 
 function clickNoteToggle(button) {
-  var currentScale = getCurrentNoteScale();
+  var currentScale = getRealNoteScale();
   var targetScale = currentScale === '/20' ? '/10' : '/20';
-  window.__noteScaleDesired = targetScale;
   updateToggleButton(button, targetScale);
   clickNoteTotalOnly(targetScale);
-  setTimeout(syncA4ProxyControls, 40);
-  setTimeout(syncA4ProxyControls, 120);
-  setTimeout(syncA4ProxyControls, 260);
-  setTimeout(syncA4ProxyControls, 520);
+  setTimeout(syncA4ProxyControls, 30);
+  setTimeout(syncA4ProxyControls, 90);
+  setTimeout(syncA4ProxyControls, 180);
 }
 
 function makeProxy(classes, title, text, action) {
@@ -170,11 +111,7 @@ function syncA4ProxyControls() {
     if (b && !b.disabled) b.click();
   });
 
-  var realScale = getRealNoteScale();
-  if (window.__noteScaleDesired && realScale === window.__noteScaleDesired) {
-    window.__noteScaleDesired = null;
-  }
-  var currentScale = getCurrentNoteScale();
+  var currentScale = getRealNoteScale();
   var nextScale = currentScale === '/20' ? '/10' : '/20';
   var noteToggle = makeProxy('a4-top-control a4-text-control a4-note-toggle-proxy', 'Basculer la note ' + nextScale, currentScale, function (button) {
     clickNoteToggle(button);
