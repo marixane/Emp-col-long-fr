@@ -95,6 +95,16 @@ function forceExerciseBottomFrame(clone) {
   body.appendChild(bottomLine);
 }
 
+function forcePdfLineBackground(clone) {
+  const hideLines = clone.classList.contains('no-pdf-lines');
+  const lineBackground = 'repeating-linear-gradient(to bottom, #ffffff 0px, #ffffff 28px, #d9d9d9 28px, #d9d9d9 29px)';
+  clone.querySelectorAll('.exercise-body').forEach(function (body) {
+    body.style.setProperty('background-color', '#ffffff', 'important');
+    body.style.setProperty('background-image', hideLines ? 'none' : lineBackground, 'important');
+    body.style.setProperty('background-repeat', 'repeat', 'important');
+  });
+}
+
 function preparePdfClone(original) {
   const clone = original.cloneNode(true);
   copyTextareaValues(original, clone);
@@ -124,6 +134,7 @@ function preparePdfClone(original) {
   const linesToggle = document.querySelector('.pdf-lines-toggle');
   const hideLines = linesToggle && String(linesToggle.textContent || '').toLowerCase().includes('masquées');
   clone.classList.toggle('no-pdf-lines', !!hideLines);
+  forcePdfLineBackground(clone);
 
   if (original.classList.contains('second-page')) stretchExtraPageForPdf(clone);
   forceExerciseBottomFrame(clone);
