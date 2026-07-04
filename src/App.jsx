@@ -1,9 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import App6 from './App6.jsx';
 import Tab from './Tab.jsx';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('cahier');
+
+  useEffect(() => {
+    document.body.classList.toggle('cahier-tab-active', activeTab === 'cahier');
+    document.body.classList.toggle('devoir-tab-active', activeTab === 'exam');
+
+    return () => {
+      document.body.classList.remove('cahier-tab-active');
+      document.body.classList.remove('devoir-tab-active');
+    };
+  }, [activeTab]);
 
   return <>
     <nav className="app-tabs">
