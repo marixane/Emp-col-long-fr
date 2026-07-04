@@ -15,6 +15,12 @@ export default function Tab() {
   const [hours, setHours] = useState(HOURS);
   const [rows, setRows] = useState(createRows);
 
+  const validateOnEnter = (event) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    event.currentTarget.blur();
+  };
+
   const updateHour = (index, value) => {
     const oldHour = hours[index];
     setHours((current) => current.map((hour, i) => i === index ? value : hour));
@@ -40,10 +46,10 @@ export default function Tab() {
     <section className="cahier-preview-zone">
       <div className="a4-page cahier-page">
         <header className="cahier-header">
-          <input value={school} onChange={(e) => setSchool(e.target.value)} />
+          <input value={school} onChange={(e) => setSchool(e.target.value)} onKeyDown={validateOnEnter} />
           <h2>Cahier de texte</h2>
-          <input value={teacher} onChange={(e) => setTeacher(e.target.value)} />
-          <input value={year} onChange={(e) => setYear(e.target.value)} />
+          <input value={teacher} onChange={(e) => setTeacher(e.target.value)} onKeyDown={validateOnEnter} />
+          <input value={year} onChange={(e) => setYear(e.target.value)} onKeyDown={validateOnEnter} />
         </header>
 
         <table className="timetable-table">
@@ -51,19 +57,20 @@ export default function Tab() {
             <tr>
               <th>Jour</th>
               {hours.map((hour, index) => <th key={`${hour}-${index}`}>
-                <textarea value={hour} onChange={(e) => updateHour(index, e.target.value)} rows="2" />
+                <textarea value={hour} onChange={(e) => updateHour(index, e.target.value)} onKeyDown={validateOnEnter} rows="2" />
               </th>)}
             </tr>
           </thead>
           <tbody>
             {rows.map((row, dayIndex) => <tr key={dayIndex}>
               <td className="hour-cell day-cell">
-                <textarea value={row.day} onChange={(e) => updateDay(dayIndex, e.target.value)} rows="2" />
+                <textarea value={row.day} onChange={(e) => updateDay(dayIndex, e.target.value)} onKeyDown={validateOnEnter} rows="2" />
               </td>
               {hours.map((hour, hourIndex) => <td key={`${hour}-${hourIndex}`}>
                 <textarea
                   value={row.cells[hour] ?? ''}
                   onChange={(e) => updateCell(dayIndex, hour, e.target.value)}
+                  onKeyDown={validateOnEnter}
                   placeholder="Classe / matière / salle"
                   rows="4"
                 />
