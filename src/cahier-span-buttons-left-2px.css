@@ -1,0 +1,3 @@
+body.cahier-tab-active .timetable-cell-content.colored-cell .span-tools {
+  transform: translateX(-5px) !important;
+}
