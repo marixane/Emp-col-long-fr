@@ -20,7 +20,7 @@ const dotTextStyle = {
   color: 'rgba(63, 64, 80, 0.28)',
   fontSize: '22px',
   fontWeight: 900,
-  lineHeight: 1.18,
+  lineHeight: 1.35,
   letterSpacing: '1px',
   whiteSpace: 'pre-wrap',
   overflow: 'hidden'
