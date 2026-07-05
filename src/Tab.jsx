@@ -5,6 +5,7 @@ const HOURS = ['08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00
 const CELL_COLORS = ['#fff3bf', '#d8f3dc', '#dbeafe', '#ffe4e6', '#ede9fe', '#cffafe', '#fef3c7', '#dcfce7', '#e0e7ff', '#fce7f3', '#ccfbf1', '#f5f5f4', '#fbcfe8', '#bfdbfe', '#bbf7d0', '#fed7aa', '#ddd6fe', '#bae6fd', '#fecdd3', '#ccfbf1'];
 const HOMEWORK_COLORS = ['#66c43f', '#b34bd7', '#2f80ed', '#ff3f5f', '#f2994a'];
 const GROUP_COLORS = ['#e0f2fe', '#dcfce7', '#fef3c7', '#fce7f3', '#ede9fe'];
+const GROUP_TITLES = ['Tronc Commun', '1ères Baccalauréat', '2ème Baccalauréat', 'Autres', 'Autres'];
 const DOT_TEXT = Array.from({ length: 4 }, () => '.'.repeat(74)).join('\n');
 
 const createCell = () => ({ text: '', room: 1, span: 1, hidden: false });
@@ -55,12 +56,10 @@ const chunkEntries = (entries, size) => entries.reduce((pages, entry, index) => 
   return pages;
 }, []);
 const getClassLevel = (className) => {
-  const cleaned = String(className ?? '').trim().replace(/\s+/g, ' ');
-  const normalized = cleaned.toUpperCase().replace(/[\s-]/g, '');
-  const bacMatch = normalized.match(/^([12])BAC/);
-  if (bacMatch) return `${bacMatch[1]}BAC`;
-  const leadingNumber = normalized.match(/^\d+/);
-  if (leadingNumber) return `Niveau ${leadingNumber[0]}`;
+  const normalized = String(className ?? '').toUpperCase().replace(/[\s-]/g, '');
+  if (normalized.startsWith('TC') || normalized.includes('TRONCCOMMUN')) return 'Tronc Commun';
+  if (normalized.startsWith('1BAC') || normalized.startsWith('1ERE') || normalized.startsWith('1ÈRE')) return '1ères Baccalauréat';
+  if (normalized.startsWith('2BAC') || normalized.startsWith('2EME') || normalized.startsWith('2ÈME')) return '2ème Baccalauréat';
   return 'Autres';
 };
 
@@ -107,26 +106,24 @@ export default function Tab() {
     return list;
   }, []));
 
-  const autoGroups = Array.from(rows.reduce((groups, row) => {
+  const autoGroups = GROUP_TITLES.map((title) => ({ title, classes: [] }));
+  rows.forEach((row) => {
     hours.forEach((hour) => {
       const cell = normalizeCell(row.cells[hour]);
       const className = cell.text.trim();
       if (!cell.hidden && className) {
         const level = getClassLevel(className);
-        const classes = groups.get(level) ?? [];
-        if (!classes.includes(className)) classes.push(className);
-        groups.set(level, classes);
+        const targetIndex = level === 'Tronc Commun' ? 0 : level === '1ères Baccalauréat' ? 1 : level === '2ème Baccalauréat' ? 2 : 3;
+        if (!autoGroups[targetIndex].classes.includes(className)) autoGroups[targetIndex].classes.push(className);
       }
     });
-    return groups;
-  }, new Map()).entries()).slice(0, 5).map(([title, classes]) => ({ title, classes }));
-  const emptyGroups = Array.from({ length: 5 }, (_, index) => ({ title: `Groupe ${index + 1}`, classes: [] }));
-  const classGroups = (manualGroups ?? autoGroups).concat(emptyGroups).slice(0, 5);
+  });
+  const classGroups = manualGroups ?? autoGroups;
 
   const moveClassToGroup = (className, targetIndex) => {
     setManualGroups((current) => {
-      const base = (current ?? classGroups).map((group, index) => ({ title: group.title || `Groupe ${index + 1}`, classes: [...(group.classes ?? [])] }));
-      const next = base.concat(emptyGroups).slice(0, 5).map((group, index) => ({ title: group.title || `Groupe ${index + 1}`, classes: group.classes.filter((item) => item !== className) }));
+      const base = (current ?? classGroups).map((group, index) => ({ title: GROUP_TITLES[index], classes: [...(group.classes ?? [])] }));
+      const next = base.map((group) => ({ ...group, classes: group.classes.filter((item) => item !== className) }));
       if (!next[targetIndex].classes.includes(className)) next[targetIndex].classes.push(className);
       return next;
     });
@@ -271,8 +268,8 @@ export default function Tab() {
           </tr>)}</tbody>
         </table>
         <div style={levelGroupsStyle}>
-          {classGroups.map((group, index) => <div key={`${group.title}-${index}`} style={{ minHeight: '84px', padding: '9px 8px', border: '2px solid rgba(17, 17, 17, 0.55)', borderRadius: '14px', background: `linear-gradient(180deg, ${GROUP_COLORS[index]}, white)`, boxShadow: '0 4px 10px rgba(17, 17, 17, 0.12)', overflow: 'hidden' }} onDragOver={(event) => { if (draggedClass) event.preventDefault(); }} onDrop={(event) => { event.preventDefault(); if (draggedClass) moveClassToGroup(draggedClass, index); setDraggedClass(null); }}>
-            <div style={levelGroupTitleStyle} contentEditable suppressContentEditableWarning onKeyDown={validateOnEnter}>{group.title}</div>
+          {classGroups.map((group, index) => <div key={`${GROUP_TITLES[index]}-${index}`} style={{ minHeight: '84px', padding: '9px 8px', border: '2px solid rgba(17, 17, 17, 0.55)', borderRadius: '14px', background: `linear-gradient(180deg, ${GROUP_COLORS[index]}, white)`, boxShadow: '0 4px 10px rgba(17, 17, 17, 0.12)', overflow: 'hidden' }} onDragOver={(event) => { if (draggedClass) event.preventDefault(); }} onDrop={(event) => { event.preventDefault(); if (draggedClass) moveClassToGroup(draggedClass, index); setDraggedClass(null); }}>
+            <div style={levelGroupTitleStyle} contentEditable suppressContentEditableWarning onKeyDown={validateOnEnter}>{GROUP_TITLES[index]}</div>
             <div style={levelGroupClassesStyle}>{group.classes.length ? group.classes.map((className) => <span key={className} style={levelChipStyle} draggable onDragStart={(event) => { event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('text/plain', className); setDraggedClass(className); }} onDragEnd={() => setDraggedClass(null)}>{className}</span>) : 'Déposer ici'}</div>
           </div>)}
         </div>
