@@ -156,6 +156,18 @@ body.cahier-tab-active .homework-page.cahier-themed-group-page > div:first-child
   background: linear-gradient(90deg, color-mix(in srgb, var(--group-cover-color) 88%, #16a34a), color-mix(in srgb, var(--group-cover-color) 54%, #22c55e)) !important;
 }
 
+body.cahier-tab-active .homework-entry:not(.cahier-exam-entry):not(.cahier-extra-holiday-entry) .homework-text {
+  height: 92px !important;
+  min-height: 92px !important;
+  max-height: 92px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 16px !important;
+  font-size: 21px !important;
+  line-height: 1.43 !important;
+  overflow: hidden !important;
+}
+
 @media print {
   body.cahier-tab-active .cahier-group-cover-page {
     page-break-after: always !important;
