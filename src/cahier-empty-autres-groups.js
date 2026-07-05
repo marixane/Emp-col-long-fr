@@ -14,12 +14,23 @@ const markEmptyAutresGroups = () => {
     const title = String(group.children?.[0]?.textContent || '').trim().toUpperCase();
     const body = group.children?.[1];
     const hasRealClass = Boolean(body?.querySelector('span'));
+    const wantedClass = title === 'AUTRES' ? (hasRealClass ? 'cahier-filled-other-group' : 'cahier-empty-other-group') : '';
+
+    if (group.dataset.autresState === wantedClass) return;
+    group.dataset.autresState = wantedClass;
     group.classList.remove('cahier-empty-other-group', 'cahier-filled-other-group');
-    if (title === 'AUTRES') group.classList.add(hasRealClass ? 'cahier-filled-other-group' : 'cahier-empty-other-group');
+    if (wantedClass) group.classList.add(wantedClass);
   });
 };
 
-const scheduleMarkEmptyAutresGroups = () => window.requestAnimationFrame(markEmptyAutresGroups);
+let autresGroupsRaf = 0;
+const scheduleMarkEmptyAutresGroups = () => {
+  if (autresGroupsRaf) return;
+  autresGroupsRaf = window.requestAnimationFrame(() => {
+    autresGroupsRaf = 0;
+    markEmptyAutresGroups();
+  });
+};
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', scheduleMarkEmptyAutresGroups, { once: true });
@@ -31,6 +42,5 @@ new MutationObserver(scheduleMarkEmptyAutresGroups).observe(document.body, {
   childList: true,
   subtree: true,
   attributes: true,
-  characterData: true,
-  attributeFilter: ['class', 'style']
+  attributeFilter: ['class']
 });
