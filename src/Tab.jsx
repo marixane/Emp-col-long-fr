@@ -27,6 +27,7 @@ const levelGroupsStyle = { display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)
 const levelGroupTitleStyle = { marginBottom: '8px', color: '#111827', fontSize: '12px', fontWeight: 900, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.3px' };
 const levelGroupClassesStyle = { display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start', gap: '7px', minHeight: '130px', color: 'rgba(17, 17, 17, 0.45)', fontSize: '10px', fontWeight: 800, lineHeight: 1.1, textAlign: 'center' };
 const levelChipStyle = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '100%', minHeight: '28px', padding: '7px 9px', borderRadius: '9px', border: '1px solid rgba(17, 17, 17, 0.22)', color: '#111827', fontSize: '12px', fontWeight: 900, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', cursor: 'grab', boxShadow: '0 1px 3px rgba(17, 17, 17, 0.12)' };
+const groupHomeworkHeaderStyle = { position: 'absolute', top: '10px', left: '18px', right: '18px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', background: 'var(--group-color)', color: '#111827', fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.4px', boxShadow: '0 2px 6px rgba(17, 17, 17, 0.12)' };
 
 const getCellColor = (text) => {
   const normalized = String(text ?? '').toLowerCase().replace(/[\s-]/g, '').trim();
@@ -129,14 +130,20 @@ export default function Tab() {
     });
   };
 
-  const homeworkEntries = Array.from({ length: 30 }, (_, index) => {
-    const date = new Date(getSchoolStartYear(), 8, index + 1);
-    const dayIndex = getMondayBasedDayIndex(date);
-    if (dayIndex >= rows.length || !sessionsByDay[dayIndex]?.length) return null;
-    const dayNumber = String(index + 1).padStart(2, '0');
-    return { date: `${String(rows[dayIndex]?.day || DAYS[dayIndex]).toUpperCase()} ${dayNumber}/09`, sessions: sessionsByDay[dayIndex], text: DOT_TEXT, color: HOMEWORK_COLORS[dayIndex % HOMEWORK_COLORS.length] };
-  }).filter(Boolean);
-  const homeworkPages = chunkEntries(homeworkEntries, 5);
+  const groupedHomeworkPages = classGroups.map((group, groupIndex) => {
+    const classSet = new Set(group.classes);
+    const entries = Array.from({ length: 30 }, (_, index) => {
+      const date = new Date(getSchoolStartYear(), 8, index + 1);
+      const dayIndex = getMondayBasedDayIndex(date);
+      if (dayIndex >= rows.length || !classSet.size) return null;
+      const sessions = (sessionsByDay[dayIndex] ?? []).filter((session) => classSet.has(session.className));
+      if (!sessions.length) return null;
+      const dayNumber = String(index + 1).padStart(2, '0');
+      return { date: `${String(rows[dayIndex]?.day || DAYS[dayIndex]).toUpperCase()} ${dayNumber}/09`, sessions, text: DOT_TEXT, color: HOMEWORK_COLORS[groupIndex % HOMEWORK_COLORS.length] };
+    }).filter(Boolean);
+
+    return { title: GROUP_TITLES[groupIndex], color: GROUP_COLORS[groupIndex], pages: chunkEntries(entries, 5) };
+  }).filter((group) => group.pages.length > 0);
 
   const canExtendLeft = (row, hourIndex) => hourIndex > 0 && Boolean(normalizeCell(row.cells[hours[hourIndex]]).text.trim()) && !normalizeCell(row.cells[hours[hourIndex - 1]]).hidden && !normalizeCell(row.cells[hours[hourIndex - 1]]).text.trim();
   const canExtendRight = (row, hourIndex) => {
@@ -275,12 +282,13 @@ export default function Tab() {
         </div>
         <footer className="cahier-footer"><span>Signature :</span><span>Observations :</span></footer>
       </div>
-      {homeworkPages.map((pageEntries, pageIndex) => <div className="a4-page cahier-page homework-page" key={`homework-page-${pageIndex}`}>
-        {pageEntries.map((entry) => <section className="homework-entry" key={entry.date} style={{ '--homework-color': entry.color }}>
+      {groupedHomeworkPages.map((group, groupIndex) => group.pages.map((pageEntries, pageIndex) => <div className="a4-page cahier-page homework-page" key={`homework-page-${groupIndex}-${pageIndex}`} style={{ '--group-color': group.color, position: 'relative', paddingTop: '50px' }}>
+        <div style={groupHomeworkHeaderStyle}>{group.title} - Mois 09</div>
+        {pageEntries.map((entry) => <section className="homework-entry" key={`${group.title}-${entry.date}`} style={{ '--homework-color': entry.color }}>
           <div className="homework-date" contentEditable suppressContentEditableWarning onKeyDown={validateOnEnter}>{entry.date}</div>
-          <div className="homework-content"><div className="homework-subject" contentEditable={entry.sessions.length === 0} suppressContentEditableWarning onKeyDown={validateOnEnter} style={entry.sessions.length ? subjectTextStyle : undefined}>{entry.sessions.map((session) => <div key={`${entry.date}-${session.hour}-${session.className}`} style={sessionLineStyle}><span style={sessionHourStyle}>{session.hour}</span><span style={sessionClassStyle}>{session.className}</span></div>)}</div><div className="homework-text" contentEditable suppressContentEditableWarning onKeyDown={validateOnEnter} style={dotTextStyle}>{entry.text}</div></div>
+          <div className="homework-content"><div className="homework-subject" contentEditable={entry.sessions.length === 0} suppressContentEditableWarning onKeyDown={validateOnEnter} style={entry.sessions.length ? subjectTextStyle : undefined}>{entry.sessions.map((session) => <div key={`${group.title}-${entry.date}-${session.hour}-${session.className}`} style={sessionLineStyle}><span style={sessionHourStyle}>{session.hour}</span><span style={sessionClassStyle}>{session.className}</span></div>)}</div><div className="homework-text" contentEditable suppressContentEditableWarning onKeyDown={validateOnEnter} style={dotTextStyle}>{entry.text}</div></div>
         </section>)}
-      </div>)}
+      </div>))}
     </section>
   </main>;
 }
