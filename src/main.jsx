@@ -92,5 +92,6 @@ import './cahier-page-numbers.css';
 import './cahier-cover-page.js';
 import './cahier-cover-zellige-fix.js';
 import './cahier-dedupe-holiday-classes.js';
+import './cahier-window-scroll-fix.css';
 
 createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>);
