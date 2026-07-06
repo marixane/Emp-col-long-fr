@@ -158,8 +158,12 @@ const applyGroupCoverPages = () => {
 
   blocks.forEach((block, index) => {
     if (!block.pages.length) return;
+    const group = filledGroups[index];
+    if (!group?.classes?.length) {
+      block.pages.forEach((page) => { page.style.display = 'none'; });
+      return;
+    }
     const color = GROUP_COVER_COLORS[index % GROUP_COVER_COLORS.length];
-    const group = filledGroups[index] || { classes: [] };
     applyThemeToBlockPages(block.pages, color);
     const cover = buildGroupCoverPage(block.title, index, group.classes, color);
     block.pages[0].before(cover);
