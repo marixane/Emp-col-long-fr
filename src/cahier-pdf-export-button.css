@@ -1,3 +1,4 @@
+/* redeploy trigger: safari-stable-v2 cahier PDF A4 fix */
 body.cahier-tab-active .cahier-pdf-export-button {
   position: fixed !important;
   right: 22px !important;
