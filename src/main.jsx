@@ -93,27 +93,21 @@ import './cahier-cover-zellige-fix.js';
 import './cahier-window-scroll-fix.css';
 import './cahier-force-scroll.js';
 import './cahier-hide-extra-school-year.css';
-import './cahier-exams-footer.css';
 import './cahier-group-box-polish.css';
 import './cahier-empty-autres-groups.js';
-import './cahier-exam-events.css';
 import './cahier-fixed-five-entries.css';
-import './cahier-group-cover-pages.css';
 
-// Pages d'accueil propres réactivées.
-import './cahier-cover-page.js';
-import './cahier-group-cover-pages.js';
-
-// Tableau des examens sous l'emploi du temps.
-import './cahier-exams-footer.js';
-
-// Bouton important de téléchargement PDF.
+// Bouton important de téléchargement PDF uniquement.
 import './cahier-pdf-export-button.js';
 
-// Gardés désactivés : scripts DOM qui modifient les événements/juillet après React.
+// Désactivés pour éviter le blocage quand on ajoute une 2e classe.
+// Ces scripts modifient le DOM après React et se relancent pendant la saisie.
+// import './cahier-cover-page.js';
+// import './cahier-group-cover-pages.js';
+// import './cahier-exams-footer.js';
+// import './cahier-exam-events.js';
 // import './cahier-dedupe-holiday-classes.js';
 // import './cahier-cover-info-panel.js';
-// import './cahier-exam-events.js';
 // import './cahier-hide-empty-group-pages.js';
 // import './cahier-july-complete.js';
 
