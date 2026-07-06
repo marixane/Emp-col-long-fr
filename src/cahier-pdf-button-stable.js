@@ -2,6 +2,7 @@ const PDF_BUTTON_ID = 'cahier-pdf-button-stable';
 const A4_WIDTH = '210mm';
 const A4_HEIGHT = '297mm';
 const EXIT_TEXT = 'La signature de procès-verbal de sortie';
+let webFinishTimer = null;
 
 const EXPORT_CSS = `
   @page { size: ${A4_WIDTH} ${A4_HEIGHT}; margin: 0; }
@@ -230,8 +231,39 @@ const createButton = () => {
   document.body.append(button);
 };
 
+const isEditing = () => {
+  const active = document.activeElement;
+  return Boolean(active?.matches?.('textarea,input,[contenteditable="true"]'));
+};
+
+const applyWebFinish = () => {
+  if (!document.body.classList.contains('cahier-tab-active')) return;
+  if (isEditing()) return;
+  const zone = document.querySelector('.cahier-preview-zone');
+  if (!zone) return;
+  zone.querySelectorAll('.cahier-pdf-exit-page').forEach((page) => page.remove());
+  removeAfterJuly10(zone);
+  appendExitPageForEachGroup(zone);
+};
+
+const scheduleWebFinish = () => {
+  window.clearTimeout(webFinishTimer);
+  webFinishTimer = window.setTimeout(applyWebFinish, 450);
+};
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', createButton, { once: true });
+  document.addEventListener('DOMContentLoaded', () => {
+    createButton();
+    scheduleWebFinish();
+  }, { once: true });
 } else {
   createButton();
+  scheduleWebFinish();
 }
+
+window.setTimeout(scheduleWebFinish, 1200);
+window.setTimeout(scheduleWebFinish, 3000);
+document.addEventListener('focusout', scheduleWebFinish, true);
+document.addEventListener('click', () => {
+  if (!isEditing()) scheduleWebFinish();
+}, true);
