@@ -26,9 +26,9 @@ const getCurrentCssText = () => Array.from(document.styleSheets)
   .replace(/<\/style/gi, '<\\/style');
 
 const wrapCssForPdf = (css) => `${'<' + 'style'}>${css}${'<' + '/style'}>`;
-
-const GROUP_TITLES_FOR_PDF = ['tronc commun', '1ères bac', '1eres bac', '2ème bac', '2eme bac', 'autres'];
+const GROUP_COLORS_FOR_PDF = ['#e0f2fe', '#dcfce7', '#fef3c7', '#fce7f3', '#ede9fe'];
 const normalizeText = (text) => String(text || '').replace(/\s+/g, ' ').trim().toLowerCase();
+const normalizeColor = (color) => String(color || '').trim().toLowerCase();
 
 const isVisiblePage = (page) => {
   const rect = page.getBoundingClientRect();
@@ -36,47 +36,35 @@ const isVisiblePage = (page) => {
   return rect.width > 50 && rect.height > 50 && style.display !== 'none' && style.visibility !== 'hidden';
 };
 
-const canonicalGroupTitle = (title) => {
-  const text = normalizeText(title);
-  if (text.includes('tronc commun')) return 'tronc commun';
-  if (text.includes('1ères bac') || text.includes('1eres bac')) return '1ères bac';
-  if (text.includes('2ème bac') || text.includes('2eme bac')) return '2ème bac';
-  if (text.includes('autres')) return 'autres';
-  return text;
-};
-
-const getFilledGroupTitles = () => {
+const findGroupGrid = () => {
   const tablePage = document.querySelector('.timetable-table')?.closest('.cahier-page');
-  if (!tablePage) return new Set();
-
-  const groupGrid = Array.from(tablePage.querySelectorAll('div'))
+  if (!tablePage) return null;
+  return Array.from(tablePage.querySelectorAll('div'))
     .find((node) => {
       const children = Array.from(node.children || []);
       return children.length === 5 && children.some((child) => /tronc commun/i.test(child.textContent || ''));
-    });
+    }) || null;
+};
 
+const getFilledGroupColors = () => {
+  const groupGrid = findGroupGrid();
   if (!groupGrid) return new Set();
 
-  return new Set(Array.from(groupGrid.children).reduce((titles, groupBox) => {
+  return new Set(Array.from(groupGrid.children).reduce((colors, groupBox, index) => {
     const children = Array.from(groupBox.children || []);
-    const title = canonicalGroupTitle(children[0]?.textContent || '');
     const classesText = normalizeText(children[1]?.textContent || '');
     const hasRealClass = classesText && classesText !== 'déposer ici';
-    if (title && hasRealClass) titles.push(title);
-    return titles;
+    if (hasRealClass && GROUP_COLORS_FOR_PDF[index]) colors.push(GROUP_COLORS_FOR_PDF[index]);
+    return colors;
   }, []));
 };
 
-const getHomeworkPageTitle = (page) => {
-  const text = canonicalGroupTitle(page.textContent || '');
-  return GROUP_TITLES_FOR_PDF.map(canonicalGroupTitle).find((title) => text.includes(title)) || '';
-};
+const getHomeworkPageColor = (page) => normalizeColor(page.style.getPropertyValue('--group-color'));
 
-const shouldExportPage = (page, filledGroupTitles) => {
+const shouldExportPage = (page, filledGroupColors) => {
   if (!page.classList.contains('homework-page')) return true;
-  if (!filledGroupTitles.size) return false;
-  const title = getHomeworkPageTitle(page);
-  return filledGroupTitles.has(title);
+  if (!filledGroupColors.size) return false;
+  return filledGroupColors.has(getHomeworkPageColor(page));
 };
 
 const prepareCloneInputs = (root) => {
@@ -92,10 +80,10 @@ const cloneA4PagesHtml = () => {
   const zone = document.querySelector('.cahier-preview-zone');
   if (!zone) return '';
 
-  const filledGroupTitles = getFilledGroupTitles();
+  const filledGroupColors = getFilledGroupColors();
   const pages = Array.from(zone.querySelectorAll('.a4-page, .cahier-page'))
     .filter(isVisiblePage)
-    .filter((page) => shouldExportPage(page, filledGroupTitles));
+    .filter((page) => shouldExportPage(page, filledGroupColors));
 
   const exportZone = document.createElement('div');
   exportZone.className = 'cahier-preview-zone';
