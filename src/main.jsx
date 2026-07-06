@@ -92,6 +92,7 @@ import './cahier-page-numbers.css';
 import './cahier-hide-extra-school-year.css';
 import './cahier-group-box-polish.css';
 import './cahier-fixed-five-entries.css';
+import './cahier-session-fit.css';
 
 // Bouton PDF Safari-safe : permanent, devant tout, sans mutation DOM web.
 // Il ne modifie les pages qu'au moment de générer le PDF.
