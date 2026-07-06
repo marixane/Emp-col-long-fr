@@ -89,23 +89,25 @@ import './cahier-texte.css';
 import './cahier-left-margin-100.css';
 import './cahier-top-space-fix.css';
 import './cahier-page-numbers.css';
-import './cahier-cover-page.js';
 import './cahier-cover-zellige-fix.js';
-import './cahier-dedupe-holiday-classes.js';
 import './cahier-window-scroll-fix.css';
 import './cahier-force-scroll.js';
-import './cahier-cover-info-panel.js';
 import './cahier-hide-extra-school-year.css';
 import './cahier-exams-footer.css';
-import './cahier-exams-footer.js';
 import './cahier-group-box-polish.css';
 import './cahier-empty-autres-groups.js';
 import './cahier-exam-events.css';
-import './cahier-exam-events.js';
-// Désactivés temporairement : ces scripts modifient le DOM après React et bloquaient dès la 2e classe.
-// import './cahier-hide-empty-group-pages.js';
 import './cahier-fixed-five-entries.css';
 import './cahier-group-cover-pages.css';
+
+// Sécurité cahier : tous les scripts DOM du cahier sont désactivés.
+// Ils entraient en conflit avec React et pouvaient bloquer dès la 2e classe.
+// import './cahier-cover-page.js';
+// import './cahier-dedupe-holiday-classes.js';
+// import './cahier-cover-info-panel.js';
+// import './cahier-exams-footer.js';
+// import './cahier-exam-events.js';
+// import './cahier-hide-empty-group-pages.js';
 // import './cahier-group-cover-pages.js';
 // import './cahier-july-complete.js';
 
