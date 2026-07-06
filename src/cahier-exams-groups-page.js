@@ -1,42 +1,49 @@
 const SECOND_PAGE_ID = 'cahier-exams-groups-page';
+const SECOND_PAGE_TITLE_CLASS = 'cahier-exams-groups-main-title';
 
 const findTimetablePage = () => document.querySelector('.timetable-table')?.closest?.('.a4-page.cahier-page');
 
 const findGroupsBlock = (page) => Array.from(page?.children || []).find((node) => {
+  if (node.id === SECOND_PAGE_ID || node.classList?.contains(SECOND_PAGE_TITLE_CLASS)) return false;
   if (node.querySelector?.('.cahier-exams-list, .timetable-table')) return false;
   const text = String(node.textContent || '').toUpperCase();
   return text.includes('TRONC COMMUN') && text.includes('1ÈRES BAC') && text.includes('2ÈME BAC');
 });
 
+const getOrCreateSecondPage = (timetablePage) => {
+  let page = document.getElementById(SECOND_PAGE_ID);
+  if (!page) {
+    page = document.createElement('div');
+    page.id = SECOND_PAGE_ID;
+    page.className = 'a4-page cahier-page cahier-exams-groups-page';
+    timetablePage.insertAdjacentElement('afterend', page);
+  }
+
+  let title = page.querySelector(`.${SECOND_PAGE_TITLE_CLASS}`);
+  if (!title) {
+    title = document.createElement('div');
+    title.className = SECOND_PAGE_TITLE_CLASS;
+    title.textContent = 'Liste des examens et groupes';
+    page.prepend(title);
+  }
+
+  return page;
+};
+
 const makeSecondPage = () => {
   const timetablePage = findTimetablePage();
   if (!timetablePage) return;
 
-  const examList = timetablePage.querySelector('.cahier-exams-list');
-  const groups = findGroupsBlock(timetablePage);
+  const secondPage = getOrCreateSecondPage(timetablePage);
+  const examList = timetablePage.querySelector('.cahier-exams-list') || secondPage.querySelector('.cahier-exams-list');
+  const groups = findGroupsBlock(timetablePage) || findGroupsBlock(secondPage);
   if (!examList || !groups) return;
 
-  document.getElementById(SECOND_PAGE_ID)?.remove();
+  examList.style.removeProperty('display');
+  groups.style.removeProperty('display');
 
-  const page = document.createElement('div');
-  page.id = SECOND_PAGE_ID;
-  page.className = 'a4-page cahier-page cahier-exams-groups-page';
-
-  const title = document.createElement('div');
-  title.className = 'cahier-exams-groups-main-title';
-  title.textContent = 'Liste des examens et groupes';
-  page.append(title);
-
-  const examClone = examList.cloneNode(true);
-  const groupsClone = groups.cloneNode(true);
-  examClone.style.display = '';
-  groupsClone.style.display = '';
-  page.append(examClone, groupsClone);
-
-  timetablePage.insertAdjacentElement('afterend', page);
-
-  examList.style.setProperty('display', 'none', 'important');
-  groups.style.setProperty('display', 'none', 'important');
+  if (examList.parentElement !== secondPage) secondPage.append(examList);
+  if (groups.parentElement !== secondPage) secondPage.append(groups);
 };
 
 const scheduleSecondPage = () => {
@@ -53,5 +60,5 @@ if (document.readyState === 'loading') {
 document.addEventListener('focusout', scheduleSecondPage, true);
 document.addEventListener('drop', scheduleSecondPage, true);
 document.addEventListener('click', (event) => {
-  if (event.target?.closest?.('.timetable-table, .span-tools, .cahier-tab, .cahier-preview-zone')) scheduleSecondPage();
+  if (event.target?.closest?.('.timetable-table, .span-tools, .cahier-tab, .cahier-preview-zone, .cahier-exams-groups-page')) scheduleSecondPage();
 }, true);
