@@ -39,7 +39,7 @@
   border-radius: 0 !important;
   background: transparent !important;
   color: #ffffff !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 900 !important;
 }
 
@@ -49,7 +49,7 @@
   border: 0 !important;
   background: #ffffff !important;
   color: #111827 !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 800 !important;
   line-height: 1.1 !important;
 }
@@ -77,17 +77,17 @@
 
 .cahier-page > .cahier-exams-list th:first-child::after {
   content: 'DATE' !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
 }
 
 .cahier-page > .cahier-exams-list th:nth-child(2)::after {
   content: 'CYCLE' !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
 }
 
 .cahier-page > .cahier-exams-list th:nth-child(3)::after {
-  content: 'EXAMEN' !important;
-  font-size: 11px !important;
+  content: 'ÉVÈNEMENT' !important;
+  font-size: 12px !important;
 }
 
 .cahier-page > .cahier-exams-list td:first-child {
@@ -104,6 +104,7 @@
   border-radius: 999px !important;
   background: #bbf7d0 !important;
   color: #14532d !important;
+  font-size: 12px !important;
   font-weight: 900 !important;
 }
 
