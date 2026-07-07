@@ -43,16 +43,45 @@ const fitNonHourLabel = (node) => {
   }
 };
 
-const markNonHourLabels = () => {
-  document.querySelectorAll('.homework-subject > div > span:first-child').forEach((node) => {
-    const nonHour = !isHourText(node.textContent);
-    node.classList.toggle('cahier-session-non-hour', nonHour);
+const fitClassLabel = (node) => {
+  node.style.setProperty('text-overflow', 'clip', 'important');
+  node.style.setProperty('white-space', 'nowrap', 'important');
+  node.style.setProperty('overflow', 'hidden', 'important');
+  node.style.removeProperty('transform');
+  node.style.removeProperty('transform-origin');
 
-    if (nonHour) {
-      fitNonHourLabel(node);
-    } else {
-      node.style.removeProperty('font-size');
+  const line = node.parentElement;
+  const classCount = line?.parentElement?.children?.length || 1;
+  const initialSize = classCount >= 4 ? 13 : classCount === 3 ? 15 : 16;
+  node.style.setProperty('font-size', `${initialSize}px`, 'important');
+
+  let size = initialSize;
+  const availableWidth = Math.max(node.clientWidth - 2, 0);
+  while (size > 8 && node.scrollWidth > availableWidth) {
+    size -= 1;
+    node.style.setProperty('font-size', `${size}px`, 'important');
+  }
+
+  if (node.scrollWidth > availableWidth && availableWidth > 0) {
+    const scale = Math.max(0.78, availableWidth / node.scrollWidth);
+    node.style.setProperty('transform', `scaleX(${scale})`, 'important');
+    node.style.setProperty('transform-origin', 'left center', 'important');
+  }
+};
+
+const markAndFitLabels = () => {
+  document.querySelectorAll('.homework-subject > div').forEach((line) => {
+    const hourNode = line.querySelector('span:first-child');
+    const classNode = line.querySelector('span:nth-child(2)');
+
+    if (hourNode) {
+      const nonHour = !isHourText(hourNode.textContent);
+      hourNode.classList.toggle('cahier-session-non-hour', nonHour);
+      if (nonHour) fitNonHourLabel(hourNode);
+      else hourNode.style.removeProperty('font-size');
     }
+
+    if (classNode) fitClassLabel(classNode);
   });
 };
 
@@ -79,7 +108,7 @@ const applySessionDurations = () => {
     });
   });
 
-  markNonHourLabels();
+  markAndFitLabels();
 };
 
 let sessionFrame = 0;
