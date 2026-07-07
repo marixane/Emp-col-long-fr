@@ -113,6 +113,7 @@ import './cahier-exams-groups-page.js';
 // Bouton PDF Safari-safe : permanent, devant tout, sans mutation DOM web.
 // Il ne modifie les pages qu'au moment de générer le PDF.
 import './cahier-pdf-button-safari-safe.js';
+import './cahier-pdf-class-size-fix.js';
 
 // Désactivé : ce helper DOM faisait buguer l'ajout de plusieurs séances.
 // import './cahier-group-cover-july10-light.js';
