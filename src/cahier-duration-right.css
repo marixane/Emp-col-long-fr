@@ -12,6 +12,11 @@
   --cahier-hour-width: 52px;
 }
 
+.homework-subject > div > span:nth-child(2) {
+  width: calc(100% + 5px) !important;
+  max-width: calc(100% + 5px) !important;
+}
+
 .cahier-session-duration {
   left: 3px !important;
   width: 16px !important;
