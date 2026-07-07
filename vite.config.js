@@ -48,16 +48,44 @@ function pdfApiPlugin() {
 
           try {
             const page = await browser.newPage();
+            await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 1 });
             await page.setContent(`<!doctype html><html><head><base href="${baseUrl}/"></head><body>${html}</body></html>`, {
               waitUntil: 'networkidle0',
               timeout: 120000
             });
-            await page.emulateMediaType('screen');
+            await page.emulateMediaType('print');
+            await page.addStyleTag({
+              content: `
+                @page { size: 210mm 297mm; margin: 0; }
+                html, body { width: 210mm !important; margin: 0 !important; padding: 0 !important; }
+                .cahier-preview-zone { width: 210mm !important; margin: 0 !important; padding: 0 !important; transform: none !important; zoom: 1 !important; }
+                .cahier-preview-zone > .a4-page,
+                .cahier-preview-zone > .cahier-page,
+                .a4-page.cahier-page {
+                  width: 210mm !important;
+                  min-width: 210mm !important;
+                  max-width: 210mm !important;
+                  height: 297mm !important;
+                  min-height: 297mm !important;
+                  max-height: 297mm !important;
+                  margin: 0 !important;
+                  transform: none !important;
+                  scale: 1 !important;
+                  zoom: 1 !important;
+                  break-after: page !important;
+                  page-break-after: always !important;
+                }
+                .a4-page:last-child, .cahier-page:last-child { break-after: auto !important; page-break-after: auto !important; }
+              `
+            });
+
             const pdf = await page.pdf({
-              format: 'A4',
+              width: '210mm',
+              height: '297mm',
+              scale: 1,
               printBackground: true,
               preferCSSPageSize: true,
-              margin: { top: 0, right: 0, bottom: 0, left: 0 }
+              margin: { top: '0mm', right: '0mm', bottom: '0mm', left: '0mm' }
             });
 
             res.statusCode = 200;
