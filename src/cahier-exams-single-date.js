@@ -1,3 +1,6 @@
+import './cahier-page5-activities.css';
+import './cahier-page5-activities.js';
+
 const formatExamDate = (start, end) => {
   const first = String(start || '').trim();
   const second = String(end || '').trim();
