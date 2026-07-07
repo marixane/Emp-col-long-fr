@@ -4,24 +4,29 @@ const tagHomeworkProgressBars = () => {
     const progressWrap = header?.children?.[1];
     const progressBar = progressWrap?.children?.[0];
 
-    if (header) header.classList.add('cahier-homework-header');
+    if (header) {
+      header.classList.add('cahier-homework-header');
+      header.style.height = '30px';
+      header.style.padding = '0 14px';
+      header.style.borderRadius = '10px';
+    }
 
     if (progressWrap) {
       progressWrap.classList.add('cahier-progress-wrap');
-      progressWrap.style.setProperty('display', 'grid', 'important');
-      progressWrap.style.setProperty('grid-template-columns', '140px 46px', 'important');
-      progressWrap.style.setProperty('width', '196px', 'important');
-      progressWrap.style.setProperty('min-width', '196px', 'important');
-      progressWrap.style.setProperty('max-width', '196px', 'important');
-      progressWrap.style.setProperty('justify-self', 'center', 'important');
-      progressWrap.style.setProperty('gap', '10px', 'important');
+      progressWrap.style.display = 'grid';
+      progressWrap.style.gridTemplateColumns = '280px 46px';
+      progressWrap.style.width = '336px';
+      progressWrap.style.minWidth = '336px';
+      progressWrap.style.maxWidth = '336px';
+      progressWrap.style.justifySelf = 'center';
+      progressWrap.style.gap = '10px';
     }
 
     if (progressBar) {
       progressBar.classList.add('cahier-progress-bar');
-      progressBar.style.setProperty('width', '140px', 'important');
-      progressBar.style.setProperty('min-width', '140px', 'important');
-      progressBar.style.setProperty('max-width', '140px', 'important');
+      progressBar.style.width = '280px';
+      progressBar.style.minWidth = '280px';
+      progressBar.style.maxWidth = '280px';
     }
   });
 };
