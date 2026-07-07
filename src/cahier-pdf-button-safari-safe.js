@@ -181,7 +181,6 @@ const ensurePdfIncludesJuly10 = (zone) => {
   zone.append(makeExitPage(lastHomeworkPage));
 };
 
-
 const stretchHomeworkPagesForPdf = (zone) => {
   zone.querySelectorAll('.homework-page').forEach((page) => {
     const entries = Array.from(page.children).filter((element) =>
@@ -191,8 +190,8 @@ const stretchHomeworkPagesForPdf = (zone) => {
     if (!entries.length) return;
 
     const pageHeight = 1123;
-    const headerSpace = 90;
-    const bottomSpace = 25;
+    const headerSpace = 110;
+    const bottomSpace = 110;
     const availableHeight = pageHeight - headerSpace - bottomSpace;
     const entryHeight = Math.floor(availableHeight / entries.length);
 
@@ -212,16 +211,8 @@ const stretchHomeworkPagesForPdf = (zone) => {
 
       if (date && content) {
         const dateHeight = 54;
-        content.style.setProperty(
-          'height',
-          `${Math.max(height - dateHeight, 20)}px`,
-          'important'
-        );
-        content.style.setProperty(
-          'min-height',
-          `${Math.max(height - dateHeight, 20)}px`,
-          'important'
-        );
+        content.style.setProperty('height', `${Math.max(height - dateHeight, 20)}px`, 'important');
+        content.style.setProperty('min-height', `${Math.max(height - dateHeight, 20)}px`, 'important');
       }
     });
   });
@@ -305,23 +296,23 @@ const exportPdf = async (button) => {
 
 const styleButton = (button) => {
   button.hidden = false;
-  button.style.cssText = 'position:fixed!important;right:22px!important;bottom:22px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;border:0!important;border-radius:999px!important;padding:14px 22px!important;min-width:190px!important;background:#16a34a!important;color:white!important;font:900 15px Arial,sans-serif!important;box-shadow:0 10px 25px rgba(0,0,0,.28)!important;cursor:pointer!important;';
+  button.style.cssText = 'position:fixed!important;right:22px!important;bottom:22px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;background:#111827!important;color:#fff!important;border:0!important;border-radius:14px!important;padding:13px 18px!important;font:900 14px Arial,sans-serif!important;box-shadow:0 8px 25px rgba(0,0,0,.35)!important;cursor:pointer!important;';
 };
 
-const createButton = () => {
-  if (document.getElementById(PDF_BUTTON_ID)) return;
-  const button = document.createElement('button');
-  button.id = PDF_BUTTON_ID;
-  button.type = 'button';
-  button.textContent = 'Télécharger PDF';
-  button.title = 'Télécharger toutes les pages A4 en PDF';
+const mountButton = () => {
+  let button = document.getElementById(PDF_BUTTON_ID);
+  if (!button) {
+    button = document.createElement('button');
+    button.id = PDF_BUTTON_ID;
+    button.type = 'button';
+    button.textContent = 'Télécharger PDF';
+    button.addEventListener('click', () => exportPdf(button));
+    document.body.append(button);
+  }
   styleButton(button);
-  button.addEventListener('click', () => exportPdf(button));
-  document.body.append(button);
 };
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', createButton, { once: true });
-} else {
-  createButton();
-}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountButton, { once: true });
+else mountButton();
+
+window.setInterval(mountButton, 2000);
