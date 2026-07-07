@@ -133,5 +133,6 @@ import './cahier-pdf-class-size-fix.js';
 // import './cahier-cover-info-panel.js';
 // import './cahier-hide-empty-group-pages.js';
 // import './cahier-july-complete.js';
+import './cahier-college-group-titles.js';
 
 createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>);
