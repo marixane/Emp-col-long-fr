@@ -145,5 +145,7 @@ import './cahier-pages-2-3-down.css';
 import './cahier-college-group-titles.js';
 import './cahier-total-hours-bottom.css';
 import './cahier-exams-no-green-title.css';
+import './cahier-exams-single-date.css';
+import './cahier-exams-single-date.js';
 
 createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>);
