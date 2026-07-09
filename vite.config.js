@@ -15,7 +15,7 @@ async function findBrowser() {
       await access(path);
       return path;
     } catch {
-      // Continue vers le navigateur suivant.
+      // Essayer le navigateur suivant.
     }
   }
   throw new Error('Google Chrome, Chromium ou Microsoft Edge est requis pour générer le PDF.');
@@ -52,10 +52,7 @@ function normalizeSchoolCalendarPlugin() {
       let nextCode = code.replace(mandatoryEventsPattern, normalizedEvents);
 
       const replacements = [
-        [
-          "const EXAM_EVENTS = MANDATORY_EVENTS.filter((event) => event.type === 'exam');",
-          'const EXAM_EVENTS = [];'
-        ],
+        ["const EXAM_EVENTS = MANDATORY_EVENTS.filter((event) => event.type === 'exam');", 'const EXAM_EVENTS = [];'],
         [
           "const holidayTextStyle = { color: '#9a3412', fontSize: '21px', fontWeight: 900, lineHeight: 1.25, letterSpacing: '0.2px', textAlign: 'center', justifyContent: 'center', background: 'linear-gradient(90deg, rgba(254,215,170,0.38), rgba(254,243,199,0.62))', borderRadius: '12px', margin: '8px 18px', padding: '10px 16px', overflow: 'hidden' };",
           "const holidayTextStyle = { color: '#9a3412', fontSize: '21px', fontWeight: 900, lineHeight: 1.25, letterSpacing: '0.2px', textAlign: 'center', justifyContent: 'center', background: 'linear-gradient(90deg, rgba(254,215,170,0.38), rgba(254,243,199,0.62))', borderRadius: '12px', margin: '8px 18px', padding: '10px 16px', overflow: 'hidden' };\nconst signatureTextStyle = { ...holidayTextStyle, color: '#5b21b6', background: 'linear-gradient(90deg, rgba(221,214,254,0.72), rgba(237,233,254,0.95))', border: '1px solid rgba(124,58,237,0.35)' };"
@@ -64,14 +61,8 @@ function normalizeSchoolCalendarPlugin() {
           "const getSchoolStartYear = () => {\n  const today = new Date();\n  return today.getMonth() >= 8 ? today.getFullYear() : today.getFullYear() - 1;\n};",
           'const getSchoolStartYear = () => 2026;'
         ],
-        [
-          'return { start: new Date(startYear, 8, 1), end: new Date(startYear + 1, 6, 31) };',
-          'return { start: new Date(startYear, 8, 1), end: new Date(startYear + 1, 6, 10) };'
-        ],
-        [
-          'const end = new Date(startYear + 1, 6, 31);',
-          'const end = new Date(startYear + 1, 6, 10);'
-        ],
+        ['return { start: new Date(startYear, 8, 1), end: new Date(startYear + 1, 6, 31) };', 'return { start: new Date(startYear, 8, 1), end: new Date(startYear + 1, 6, 10) };'],
+        ['const end = new Date(startYear + 1, 6, 31);', 'const end = new Date(startYear + 1, 6, 10);'],
         [
           "const getMandatoryEventStart = (monthDate) => MANDATORY_EVENTS.filter((event) => event.start === monthDate);",
           "const getMandatoryEventStart = (monthDate) => MANDATORY_EVENTS.filter((event) => event.type === 'holiday' && event.start === monthDate);"
@@ -91,15 +82,35 @@ function normalizeSchoolCalendarPlugin() {
       ];
 
       for (const [search, replacement] of replacements) {
-        if (!nextCode.includes(search)) {
-          throw new Error('Impossible d’appliquer une correction du calendrier dans Tab.jsx');
-        }
+        if (!nextCode.includes(search)) throw new Error('Impossible d’appliquer une correction du calendrier dans Tab.jsx');
         nextCode = nextCode.replace(search, replacement);
       }
 
-      if (!examListPattern.test(nextCode)) {
-        throw new Error('Impossible de retirer la liste des examens de Tab.jsx');
+      const forceSignatureSearch = "    }).filter(Boolean);\n\n    return { title: GROUP_TITLES[groupIndex], color: GROUP_COLORS[groupIndex], classes: group.classes, pages: chunkEntries(entries, 5) };";
+      const forceSignatureReplacement = `    }).filter(Boolean);
+
+    const forcedSignatureEntry = {
+      date: 'SAMEDI 10/07',
+      sessions: [{ hour: 'Administration', className: '' }],
+      text: 'Signature procès-verbal',
+      isHoliday: true,
+      isExam: false,
+      isPurple: true,
+      progressDate: '10/07',
+      color: '#8b5cf6',
+      eventKey: '10/07-forced-signature'
+    };
+    const entriesWithoutSignature = entries.filter((entry) => entry.eventKey !== '10/07-0' && entry.progressDate !== '10/07');
+    entriesWithoutSignature.push(forcedSignatureEntry);
+
+    return { title: GROUP_TITLES[groupIndex], color: GROUP_COLORS[groupIndex], classes: group.classes, pages: chunkEntries(entriesWithoutSignature, 5) };`;
+
+      if (!nextCode.includes(forceSignatureSearch)) {
+        throw new Error('Impossible de forcer l’événement du 10/07 dans Tab.jsx');
       }
+      nextCode = nextCode.replace(forceSignatureSearch, forceSignatureReplacement);
+
+      if (!examListPattern.test(nextCode)) throw new Error('Impossible de retirer la liste des examens de Tab.jsx');
       nextCode = nextCode.replace(examListPattern, '');
 
       return { code: nextCode, map: null };
@@ -125,9 +136,8 @@ function pdfApiPlugin() {
           const { html = '', baseUrl = '' } = JSON.parse(body || '{}');
           if (!html) throw new Error('Contenu PDF vide');
 
-          const executablePath = await findBrowser();
           const browser = await puppeteer.launch({
-            executablePath,
+            executablePath: await findBrowser(),
             headless: 'new',
             args: ['--no-sandbox', '--disable-setuid-sandbox']
           });
@@ -140,74 +150,28 @@ function pdfApiPlugin() {
               timeout: 120000
             });
             await page.emulateMediaType('print');
-            await page.addStyleTag({
-              content: `
-                @page { size: 210mm 297mm; margin: 0; }
-                html, body { width: 210mm !important; margin: 0 !important; padding: 0 !important; }
-                .cahier-preview-zone { width: 210mm !important; margin: 0 !important; padding: 0 !important; transform: none !important; zoom: 1 !important; }
-                .cahier-preview-zone > .a4-page,
-                .cahier-preview-zone > .cahier-page,
-                .a4-page.cahier-page {
-                  width: 210mm !important;
-                  min-width: 210mm !important;
-                  max-width: 210mm !important;
-                  height: 297mm !important;
-                  min-height: 297mm !important;
-                  max-height: 297mm !important;
-                  margin: 0 !important;
-                  transform: none !important;
-                  scale: 1 !important;
-                  zoom: 1 !important;
-                  break-after: page !important;
-                  page-break-after: always !important;
-                }
-                .homework-page {
-                  padding-left: 14mm !important;
-                  padding-right: 8mm !important;
-                  padding-bottom: 8mm !important;
-                  display: flex !important;
-                  flex-direction: column !important;
-                  box-sizing: border-box !important;
-                }
-                .homework-page > *,
-                .homework-page .homework-entry,
-                .homework-page .homework-content,
-                .homework-page .homework-text,
-                .homework-page .homework-subject {
-                  width: 100% !important;
-                  max-width: none !important;
-                  box-sizing: border-box !important;
-                }
-                .homework-page .homework-entry {
-                  margin-left: 0 !important;
-                  margin-right: 0 !important;
-                  flex: 1 1 0 !important;
-                  min-height: 0 !important;
-                  display: flex !important;
-                  flex-direction: column !important;
-                }
-                .homework-page .homework-content {
-                  grid-template-columns: 40% 60% !important;
-                  flex: 1 1 auto !important;
-                  min-height: 0 !important;
-                }
-                .homework-page .homework-text {
-                  padding-right: 0 !important;
-                  margin-right: 0 !important;
-                }
-                .homework-page > .homework-entry:last-child {
-                  border-bottom: 1px solid rgba(63,64,80,.18) !important;
-                }
-                .a4-page:last-child, .cahier-page:last-child { break-after: auto !important; page-break-after: auto !important; }
-              `
-            });
+            await page.addStyleTag({ content: `
+              @page { size: 210mm 297mm; margin: 0; }
+              html, body { width: 210mm !important; margin: 0 !important; padding: 0 !important; }
+              .cahier-preview-zone { width: 210mm !important; margin: 0 !important; padding: 0 !important; transform: none !important; zoom: 1 !important; }
+              .cahier-preview-zone > .a4-page, .cahier-preview-zone > .cahier-page, .a4-page.cahier-page {
+                width: 210mm !important; min-width: 210mm !important; max-width: 210mm !important;
+                height: 297mm !important; min-height: 297mm !important; max-height: 297mm !important;
+                margin: 0 !important; transform: none !important; scale: 1 !important; zoom: 1 !important;
+                break-after: page !important; page-break-after: always !important;
+              }
+              .homework-page { padding-left: 14mm !important; padding-right: 8mm !important; padding-bottom: 8mm !important; display: flex !important; flex-direction: column !important; box-sizing: border-box !important; }
+              .homework-page > *, .homework-page .homework-entry, .homework-page .homework-content, .homework-page .homework-text, .homework-page .homework-subject { width: 100% !important; max-width: none !important; box-sizing: border-box !important; }
+              .homework-page .homework-entry { margin-left: 0 !important; margin-right: 0 !important; flex: 1 1 0 !important; min-height: 0 !important; display: flex !important; flex-direction: column !important; }
+              .homework-page .homework-content { grid-template-columns: 40% 60% !important; flex: 1 1 auto !important; min-height: 0 !important; }
+              .homework-page .homework-text { padding-right: 0 !important; margin-right: 0 !important; }
+              .homework-page > .homework-entry:last-child { border-bottom: 1px solid rgba(63,64,80,.18) !important; }
+              .a4-page:last-child, .cahier-page:last-child { break-after: auto !important; page-break-after: auto !important; }
+            ` });
 
             const pdf = await page.pdf({
-              width: '210mm',
-              height: '297mm',
-              scale: 1,
-              printBackground: true,
-              preferCSSPageSize: true,
+              width: '210mm', height: '297mm', scale: 1,
+              printBackground: true, preferCSSPageSize: true,
               margin: { top: '0mm', right: '0mm', bottom: '0mm', left: '0mm' }
             });
 
@@ -231,11 +195,6 @@ function pdfApiPlugin() {
 
 export default defineConfig({
   plugins: [normalizeSchoolCalendarPlugin(), react(), pdfApiPlugin()],
-  build: {
-    target: 'es2017',
-    cssTarget: 'safari13'
-  },
-  esbuild: {
-    target: 'es2017'
-  }
+  build: { target: 'es2017', cssTarget: 'safari13' },
+  esbuild: { target: 'es2017' }
 });
