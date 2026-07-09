@@ -4,7 +4,7 @@
 
 .cahier-preview-zone > .cahier-page:not(.homework-page):not(.homework-cover-page) .total-hours-control {
   position: absolute !important;
-  left: calc(50% + 20px) !important;
+  left: calc(50% + 100px) !important;
   right: auto !important;
   top: auto !important;
   bottom: 348px !important;
@@ -34,7 +34,7 @@
 
 @media print {
   .cahier-preview-zone > .cahier-page:not(.homework-page):not(.homework-cover-page) .total-hours-control {
-    left: calc(50% + 20px) !important;
+    left: calc(50% + 100px) !important;
     bottom: calc(10mm + 330px) !important;
   }
 }
