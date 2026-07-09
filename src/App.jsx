@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect } from 'react';
 import Tab from './Tab.jsx';
 
 const subjectStyle = {
@@ -59,7 +58,7 @@ const eventStyle = {
   overflow: 'hidden'
 };
 
-const newPageHeaderStyle = {
+const headerStyle = {
   position: 'absolute',
   top: '10px',
   left: '50px',
@@ -91,52 +90,43 @@ function SignatureRow() {
   </section>;
 }
 
+function EmptyRow({ index }) {
+  return <section className="homework-entry forced-empty-row" aria-hidden="true" key={index}>
+    <div className="homework-date" />
+    <div className="homework-content">
+      <div className="homework-subject" />
+      <div className="homework-text" />
+    </div>
+  </section>;
+}
+
 function SignaturePage() {
   return <main className="cahier-shell clean-cahier-shell forced-signature-shell">
     <section className="cahier-preview-zone">
       <div className="a4-page cahier-page homework-page forced-signature-page" style={{ position: 'relative', paddingTop: '60px', '--group-color': '#ddd6fe' }}>
-        <div style={newPageHeaderStyle}>
+        <div style={headerStyle}>
           <strong style={{ fontSize: '20px', textTransform: 'uppercase' }}>Clôture administrative</strong>
           <strong style={{ color: '#5b21b6', fontSize: '14px' }}>10/07/2027</strong>
         </div>
         <SignatureRow />
+        {[1, 2, 3, 4].map((index) => <EmptyRow key={index} index={index} />)}
       </div>
     </section>
   </main>;
 }
 
 export default function App() {
-  const [lastHomeworkPage, setLastHomeworkPage] = useState(null);
-  const [needsNewPage, setNeedsNewPage] = useState(false);
-
   useEffect(() => {
     document.body.classList.add('cahier-tab-active');
     document.body.classList.remove('devoir-tab-active');
 
-    const inspectPages = () => {
-      const pages = [...document.querySelectorAll('.cahier-preview-zone .homework-page:not(.forced-signature-page)')];
-      const lastPage = pages.at(-1) ?? null;
-      const rowCount = lastPage
-        ? lastPage.querySelectorAll(':scope > .homework-entry:not(.forced-signature-row)').length
-        : 0;
-
-      setLastHomeworkPage(lastPage);
-      setNeedsNewPage(Boolean(lastPage && rowCount >= 5));
-    };
-
-    inspectPages();
-    const observer = new MutationObserver(inspectPages);
-    observer.observe(document.body, { childList: true, subtree: true });
-
     return () => {
-      observer.disconnect();
       document.body.classList.remove('cahier-tab-active');
     };
   }, []);
 
   return <>
     <Tab />
-    {lastHomeworkPage && !needsNewPage && createPortal(<SignatureRow />, lastHomeworkPage)}
-    {needsNewPage && <SignaturePage />}
+    <SignaturePage />
   </>;
 }
