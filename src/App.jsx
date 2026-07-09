@@ -19,6 +19,11 @@ export default function App() {
         transform: none !important;
       }
 
+      .total-hours-control {
+        position: relative !important;
+        top: -100px !important;
+      }
+
       .cahier-page > div[style*="grid-template-columns: repeat(3, 1fr)"] {
         margin-top: 96px !important;
       }
