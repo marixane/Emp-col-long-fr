@@ -1,5 +1,16 @@
 body.cahier-tab-active .homework-page {
   --cahier-entry-height: 186px;
+  --cahier-content-height: 124px;
+}
+
+body.cahier-tab-active .homework-page.cahier-lines-per-page-3 {
+  --cahier-entry-height: 310px;
+  --cahier-content-height: 248px;
+}
+
+body.cahier-tab-active .homework-page.cahier-lines-per-page-2 {
+  --cahier-entry-height: 465px;
+  --cahier-content-height: 403px;
 }
 
 body.cahier-tab-active:not(:has(.timetable-table tbody textarea[placeholder="Classe"]:not(:placeholder-shown))) .homework-page {
@@ -8,10 +19,6 @@ body.cahier-tab-active:not(:has(.timetable-table tbody textarea[placeholder="Cla
 
 body.cahier-tab-active:has(.timetable-table tbody textarea[placeholder="Classe"]:not(:placeholder-shown)) .homework-page {
   display: block !important;
-}
-
-body.cahier-tab-active:has(.timetable-table tbody textarea[placeholder="Classe"]:not(:placeholder-shown)) .homework-page:not(:has(.homework-entry:not(.cahier-exam-entry):not(.cahier-extra-holiday-entry))) {
-  display: none !important;
 }
 
 body.cahier-tab-active .homework-page .homework-entry {
@@ -38,9 +45,9 @@ body.cahier-tab-active .homework-page .homework-date {
 
 body.cahier-tab-active .homework-page .homework-content {
   box-sizing: border-box !important;
-  height: 124px !important;
-  min-height: 124px !important;
-  max-height: 124px !important;
+  height: var(--cahier-content-height) !important;
+  min-height: var(--cahier-content-height) !important;
+  max-height: var(--cahier-content-height) !important;
   display: grid !important;
   grid-template-columns: 210px 1fr !important;
   overflow: hidden !important;
@@ -49,9 +56,9 @@ body.cahier-tab-active .homework-page .homework-content {
 body.cahier-tab-active .homework-page .homework-subject,
 body.cahier-tab-active .homework-page .homework-text {
   box-sizing: border-box !important;
-  height: 124px !important;
-  min-height: 124px !important;
-  max-height: 124px !important;
+  height: var(--cahier-content-height) !important;
+  min-height: var(--cahier-content-height) !important;
+  max-height: var(--cahier-content-height) !important;
   overflow: hidden !important;
 }
 
@@ -62,9 +69,9 @@ body.cahier-tab-active .homework-page .homework-text {
 }
 
 body.cahier-tab-active .homework-entry:not(.cahier-exam-entry):not(.cahier-extra-holiday-entry) .homework-text {
-  height: 124px !important;
-  min-height: 124px !important;
-  max-height: 124px !important;
+  height: var(--cahier-content-height) !important;
+  min-height: var(--cahier-content-height) !important;
+  max-height: var(--cahier-content-height) !important;
   padding-top: 8px !important;
   padding-bottom: 0 !important;
   font-size: 21px !important;
@@ -92,5 +99,16 @@ body.cahier-tab-active .homework-page .homework-subject > div {
 @media print {
   body.cahier-tab-active .homework-page {
     --cahier-entry-height: 186px;
+    --cahier-content-height: 124px;
+  }
+
+  body.cahier-tab-active .homework-page.cahier-lines-per-page-3 {
+    --cahier-entry-height: 310px;
+    --cahier-content-height: 248px;
+  }
+
+  body.cahier-tab-active .homework-page.cahier-lines-per-page-2 {
+    --cahier-entry-height: 465px;
+    --cahier-content-height: 403px;
   }
 }
