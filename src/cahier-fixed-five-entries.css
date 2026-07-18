@@ -127,7 +127,8 @@ body.cahier-tab-active
   top: 13px;
   left: 18px;
   z-index: 1;
-  padding: 0 9px 0 2px;
+  /* Petit retrait blanc avant le libellé, puis reprise des points après lui. */
+  padding: 0 9px 0 14px;
   background: #fff;
   color: #aeb2bb;
   -webkit-text-fill-color: #aeb2bb;
