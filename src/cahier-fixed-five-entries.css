@@ -114,7 +114,9 @@ body.cahier-tab-active
   z-index: 0;
   pointer-events: none;
   background-image: radial-gradient(circle, #aeb2bb 1.15px, transparent 1.35px);
-  background-position: 0 22px;
+  /* Le point est centré dans une tuile haute de 28 px : un départ à 8 px
+     place donc son centre à 22 px, exactement au centre du libellé. */
+  background-position: 0 8px;
   background-size: 7px 28px;
   background-repeat: repeat;
 }
